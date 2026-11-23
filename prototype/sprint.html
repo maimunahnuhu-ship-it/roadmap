@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprint 2 · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="backlog.html"><span class="logo-mark" aria-hidden="true"></span><span>Roadmap</span></a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="backlog.html">Backlog</a>
+        <a href="sprints.html" aria-current="page">Sprints</a>
+        <a href="modules.html">Modules</a>
+        <a href="equipe.html">Équipe</a>
+      </nav>
+      <div class="user">
+        <span class="avatar md av-marie" title="Marie Laurent">ML</span>
+        <span class="user-name">Marie Laurent</span>
+        <a class="btn btn-ghost btn-sm" href="index.html">Déconnexion</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <a class="back" href="sprints.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Sprints
+    </a>
+    <div class="page-head" style="margin-bottom:var(--space-8)">
+      <div>
+        <div class="row-inline" style="gap:var(--space-3)">
+          <h1>Sprint 2</h1>
+          <span class="status s-active">Actif</span>
+        </div>
+        <p class="body-lg" style="margin-top:var(--space-2)">Réduire l'abandon pendant l'onboarding.</p>
+        <p class="data soft" style="margin-top:var(--space-1)">16 nov. → 27 nov. 2026</p>
+      </div>
+      <div class="head-actions">
+        <select class="chip-select" aria-label="Statut du sprint">
+          <option>Statut : planifié</option>
+          <option selected>Statut : actif</option>
+          <option>Statut : terminé</option>
+        </select>
+        <a class="btn btn-secondary" href="#modifier-sprint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>
+          Modifier
+        </a>
+        <a class="btn btn-primary" href="#ajouter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Ajouter depuis le backlog
+        </a>
+      </div>
+    </div>
+
+    <!-- Avancement -->
+    <section class="card counter-card" style="margin-bottom:var(--space-8)">
+      <span class="band aurora"></span>
+      <div class="row-inline" style="justify-content:space-between">
+        <div class="counter-figure"><span class="data-xl">1</span><span class="label">terminée sur 5</span></div>
+        <span class="data soft">4 jours restants</span>
+      </div>
+      <div class="progress-row">
+        <div class="progress"><span style="width:20%"></span></div>
+        <span class="data">20 %</span>
+      </div>
+    </section>
+
+    <!-- Features regroupées par statut -->
+    <div class="board">
+      <section class="column">
+        <div class="column-head"><span class="status s-todo">À faire</span><span class="count-pill">2</span></div>
+        <div class="column-items">
+          <article class="mini-card">
+            <a class="mini-title" href="feature.html">Widget de revenu mensuel récurrent</a>
+            <span class="module m-dashboard"><span class="bille"></span>Dashboard</span>
+            <div class="mini-foot">
+              <div class="row-inline">
+                <span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span>
+                <span class="effort">M</span>
+              </div>
+              <div class="row-inline">
+                <button class="btn btn-ghost btn-sm" type="button" title="Retirer du sprint (retour au backlog)">Retirer</button>
+                <span class="avatar av-thomas" title="Thomas Renard">TR</span>
+              </div>
+            </div>
+          </article>
+          <article class="mini-card">
+            <a class="mini-title" href="feature.html">E-mail de bienvenue personnalisé</a>
+            <span class="module m-onboarding"><span class="bille"></span>Onboarding</span>
+            <div class="mini-foot">
+              <div class="row-inline">
+                <span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span>
+                <span class="effort">S</span>
+              </div>
+              <div class="row-inline">
+                <button class="btn btn-ghost btn-sm" type="button" title="Retirer du sprint (retour au backlog)">Retirer</button>
+                <span class="avatar av-marie" title="Marie Laurent">ML</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="column">
+        <div class="column-head"><span class="status s-in_progress">En cours</span><span class="count-pill">2</span></div>
+        <div class="column-items">
+          <article class="mini-card">
+            <a class="mini-title" href="feature.html">Checklist de démarrage guidée</a>
+            <span class="module m-onboarding"><span class="bille"></span>Onboarding</span>
+            <div class="mini-foot">
+              <div class="row-inline">
+                <span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span>
+                <span class="effort">L</span>
+              </div>
+              <div class="row-inline">
+                <button class="btn btn-ghost btn-sm" type="button" title="Retirer du sprint (retour au backlog)">Retirer</button>
+                <span class="avatar av-sarah" title="Sarah Kessler">SK</span>
+              </div>
+            </div>
+          </article>
+          <article class="mini-card">
+            <a class="mini-title" href="feature.html">Import de contacts depuis un fichier CSV</a>
+            <span class="module m-onboarding"><span class="bille"></span>Onboarding</span>
+            <div class="mini-foot">
+              <div class="row-inline">
+                <span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span>
+                <span class="effort">M</span>
+              </div>
+              <div class="row-inline">
+                <button class="btn btn-ghost btn-sm" type="button" title="Retirer du sprint (retour au backlog)">Retirer</button>
+                <span class="avatar av-lucas" title="Lucas Martin">LM</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="column">
+        <div class="column-head"><span class="status s-done">Terminé</span><span class="count-pill">1</span></div>
+        <div class="column-items">
+          <article class="mini-card">
+            <a class="mini-title" href="feature.html">Pouvoir passer l'étape de configuration</a>
+            <span class="module m-onboarding"><span class="bille"></span>Onboarding</span>
+            <div class="mini-foot">
+              <div class="row-inline">
+                <span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span>
+                <span class="effort">XS</span>
+              </div>
+              <div class="row-inline">
+                <button class="btn btn-ghost btn-sm" type="button" title="Retirer du sprint (retour au backlog)">Retirer</button>
+                <span class="avatar av-sarah" title="Sarah Kessler">SK</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Fenêtre : ajouter des features depuis le backlog -->
+  <div class="modal" id="ajouter" role="dialog" aria-modal="true" aria-labelledby="aj-title">
+    <a class="modal-backdrop" href="#" aria-label="Fermer"></a>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 id="aj-title">Ajouter au sprint 2</h2>
+          <p class="soft small">Features du backlog, sans sprint.</p>
+        </div>
+        <a class="btn btn-ghost btn-icon" href="#" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </a>
+      </div>
+      <div class="pick-list">
+        <label class="pick"><input type="checkbox"><span class="bille m-acces"></span><span class="t">Authentification à deux facteurs</span><span class="prio p-critical compact"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Critique</span></span></label>
+        <label class="pick"><input type="checkbox"><span class="bille m-acces"></span><span class="t">Rôles et permissions personnalisés</span><span class="prio p-high compact"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></label>
+        <label class="pick"><input type="checkbox"><span class="bille m-acces"></span><span class="t">Journal d'audit des connexions</span><span class="prio p-medium compact"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span></label>
+        <label class="pick"><input type="checkbox"><span class="bille m-dashboard"></span><span class="t">Filtres enregistrés sur le dashboard</span><span class="prio p-low compact"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Basse</span></span></label>
+        <label class="pick"><input type="checkbox"><span class="bille m-dashboard"></span><span class="t">Mode sombre du dashboard</span><span class="prio p-nice compact"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Bonus</span></span></label>
+      </div>
+      <div class="modal-foot">
+        <a class="btn btn-ghost" href="#">Annuler</a>
+        <a class="btn btn-primary" href="#">Ajouter au sprint</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fenêtre : modifier le sprint -->
+  <div class="modal" id="modifier-sprint" role="dialog" aria-modal="true" aria-labelledby="ms-title">
+    <a class="modal-backdrop" href="#" aria-label="Fermer"></a>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="ms-title">Modifier le sprint 2</h2>
+        <a class="btn btn-ghost btn-icon" href="#" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </a>
+      </div>
+      <form class="form-grid" onsubmit="location.hash=''; return false;">
+        <div class="field">
+          <label class="label req" for="ms-debut">Date de début</label>
+          <input class="input" id="ms-debut" type="date" value="2026-11-16">
+        </div>
+        <div class="field">
+          <label class="label req" for="ms-fin">Date de fin</label>
+          <input class="input" id="ms-fin" type="date" value="2026-11-27">
+        </div>
+        <div class="field full">
+          <label class="label" for="ms-objectif">Objectif</label>
+          <input class="input" id="ms-objectif" value="Réduire l'abandon pendant l'onboarding.">
+          <span class="help">En une phrase.</span>
+        </div>
+        <div class="modal-foot full" style="margin-top:var(--space-3)">
+          <a class="btn btn-ghost" href="#">Annuler</a>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

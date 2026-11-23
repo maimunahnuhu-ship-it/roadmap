@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backlog · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="backlog.html"><span class="logo-mark" aria-hidden="true"></span><span>Roadmap</span></a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="backlog.html" aria-current="page">Backlog</a>
+        <a href="sprints.html">Sprints</a>
+        <a href="modules.html">Modules</a>
+        <a href="equipe.html">Équipe</a>
+      </nav>
+      <div class="user">
+        <span class="avatar md av-marie" title="Marie Laurent">ML</span>
+        <span class="user-name">Marie Laurent</span>
+        <a class="btn btn-ghost btn-sm" href="index.html">Déconnexion</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Backlog</h1>
+        <p class="subtitle"><span class="data" id="count">16</span> features affichées</p>
+      </div>
+      <a class="btn btn-primary" href="#nouvelle-feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouvelle feature
+      </a>
+    </div>
+
+    <!-- Recherche, filtres et tri -->
+    <div class="toolbar">
+      <label class="search">
+        <span class="sr-only">Rechercher par titre</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Rechercher une feature…">
+      </label>
+      <select class="chip-select" id="f-module" data-key="module" aria-label="Filtrer par module">
+        <option value="">Module</option>
+        <option value="facturation">Facturation</option>
+        <option value="onboarding">Onboarding</option>
+        <option value="dashboard">Dashboard</option>
+        <option value="notifications">Notifications</option>
+        <option value="acces">Gestion des accès</option>
+      </select>
+      <select class="chip-select" id="f-status" data-key="status" aria-label="Filtrer par statut">
+        <option value="">Statut</option>
+        <option value="backlog">Backlog</option>
+        <option value="todo">À faire</option>
+        <option value="in_progress">En cours</option>
+        <option value="done">Terminé</option>
+        <option value="cancelled">Annulé</option>
+      </select>
+      <select class="chip-select" id="f-priority" data-key="priority" aria-label="Filtrer par priorité">
+        <option value="">Priorité</option>
+        <option value="critical">Critique</option>
+        <option value="high">Haute</option>
+        <option value="medium">Moyenne</option>
+        <option value="low">Basse</option>
+        <option value="nice">Bonus</option>
+      </select>
+      <select class="chip-select" id="f-sprint" data-key="sprint" aria-label="Filtrer par sprint">
+        <option value="">Sprint</option>
+        <option value="none">Sans sprint</option>
+        <option value="1">Sprint 1</option>
+        <option value="2">Sprint 2</option>
+        <option value="3">Sprint 3</option>
+      </select>
+      <select class="chip-select" id="f-assignee" data-key="assignee" aria-label="Filtrer par personne assignée">
+        <option value="">Assigné à</option>
+        <option value="marie">Marie Laurent</option>
+        <option value="thomas">Thomas Renard</option>
+        <option value="sarah">Sarah Kessler</option>
+        <option value="lucas">Lucas Martin</option>
+        <option value="none">Personne</option>
+      </select>
+      <span class="spacer"></span>
+      <select class="chip-select" id="sort" aria-label="Trier">
+        <option value="recent">Tri : plus récentes</option>
+        <option value="priority">Tri : priorité</option>
+        <option value="impact">Tri : impact</option>
+      </select>
+    </div>
+
+    <!-- En-têtes de colonnes -->
+    <div class="list-head list-cols label" aria-hidden="true">
+      <span>Feature</span>
+      <span class="col-module">Module</span>
+      <span>Statut</span>
+      <span class="col-prio">Priorité</span>
+      <span class="col-effort">Effort</span>
+      <span class="col-impact">Impact</span>
+      <span class="col-sprint">Sprint</span>
+      <span></span>
+    </div>
+
+    <div class="feature-list" id="list">
+      <a class="feature-row list-cols" href="feature.html" data-id="16" data-module="acces" data-status="backlog" data-priority="medium" data-rank="3" data-impact="1" data-sprint="none" data-assignee="thomas">
+        <span class="feature-title"><span class="bille m-acces"></span><span>Journal d'audit des connexions</span></span>
+        <span class="col-module cell-soft">Gestion des accès</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span></span>
+        <span class="col-effort"><span class="effort">—</span></span>
+        <span class="col-impact cell-soft">Faible</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-thomas" title="Thomas Renard">TR</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="15" data-module="dashboard" data-status="backlog" data-priority="low" data-rank="4" data-impact="2" data-sprint="none" data-assignee="sarah">
+        <span class="feature-title"><span class="bille m-dashboard"></span><span>Filtres enregistrés sur le dashboard</span></span>
+        <span class="col-module cell-soft">Dashboard</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-low"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Basse</span></span></span>
+        <span class="col-effort"><span class="effort">S</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-sarah" title="Sarah Kessler">SK</span>
+      </a>
+      <a class="feature-row list-cols is-cancelled" href="feature.html" data-id="14" data-module="notifications" data-status="cancelled" data-priority="low" data-rank="4" data-impact="1" data-sprint="none" data-assignee="lucas">
+        <span class="feature-title"><span class="bille m-notifications"></span><span>Notifications push sur mobile</span></span>
+        <span class="col-module cell-soft">Notifications</span>
+        <span><span class="status s-cancelled">Annulé</span></span>
+        <span class="col-prio"><span class="prio p-low"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Basse</span></span></span>
+        <span class="col-effort"><span class="effort">XL</span></span>
+        <span class="col-impact cell-soft">Faible</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-lucas" title="Lucas Martin">LM</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="13" data-module="dashboard" data-status="backlog" data-priority="nice" data-rank="5" data-impact="1" data-sprint="none" data-assignee="none">
+        <span class="feature-title"><span class="bille m-dashboard"></span><span>Mode sombre du dashboard</span></span>
+        <span class="col-module cell-soft">Dashboard</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-nice"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Bonus</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Faible</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-none" title="Non assignée"></span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="12" data-module="acces" data-status="backlog" data-priority="critical" data-rank="1" data-impact="3" data-sprint="none" data-assignee="marie">
+        <span class="feature-title"><span class="bille m-acces"></span><span>Authentification à deux facteurs</span></span>
+        <span class="col-module cell-soft">Gestion des accès</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-critical"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Critique</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-marie" title="Marie Laurent">ML</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="11" data-module="acces" data-status="backlog" data-priority="high" data-rank="2" data-impact="2" data-sprint="none" data-assignee="none">
+        <span class="feature-title"><span class="bille m-acces"></span><span>Rôles et permissions personnalisés</span></span>
+        <span class="col-module cell-soft">Gestion des accès</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">XL</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sans sprint</span>
+        <span class="avatar av-none" title="Non assignée"></span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="10" data-module="notifications" data-status="backlog" data-priority="medium" data-rank="3" data-impact="2" data-sprint="3" data-assignee="none">
+        <span class="feature-title"><span class="bille m-notifications"></span><span>Résumé hebdomadaire par e-mail</span></span>
+        <span class="col-module cell-soft">Notifications</span>
+        <span><span class="status s-backlog">Backlog</span></span>
+        <span class="col-prio"><span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sprint 3</span>
+        <span class="avatar av-none" title="Non assignée"></span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="9" data-module="notifications" data-status="todo" data-priority="high" data-rank="2" data-impact="3" data-sprint="3" data-assignee="lucas">
+        <span class="feature-title"><span class="bille m-notifications"></span><span>Préférences de notification par canal</span></span>
+        <span class="col-module cell-soft">Notifications</span>
+        <span><span class="status s-todo">À faire</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">L</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 3</span>
+        <span class="avatar av-lucas" title="Lucas Martin">LM</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="8" data-module="dashboard" data-status="todo" data-priority="high" data-rank="2" data-impact="3" data-sprint="2" data-assignee="thomas">
+        <span class="feature-title"><span class="bille m-dashboard"></span><span>Widget de revenu mensuel récurrent</span></span>
+        <span class="col-module cell-soft">Dashboard</span>
+        <span><span class="status s-todo">À faire</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 2</span>
+        <span class="avatar av-thomas" title="Thomas Renard">TR</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="7" data-module="onboarding" data-status="done" data-priority="high" data-rank="2" data-impact="3" data-sprint="2" data-assignee="sarah">
+        <span class="feature-title"><span class="bille m-onboarding"></span><span>Pouvoir passer l'étape de configuration</span></span>
+        <span class="col-module cell-soft">Onboarding</span>
+        <span><span class="status s-done">Terminé</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">XS</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 2</span>
+        <span class="avatar av-sarah" title="Sarah Kessler">SK</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="6" data-module="onboarding" data-status="todo" data-priority="medium" data-rank="3" data-impact="2" data-sprint="2" data-assignee="marie">
+        <span class="feature-title"><span class="bille m-onboarding"></span><span>E-mail de bienvenue personnalisé</span></span>
+        <span class="col-module cell-soft">Onboarding</span>
+        <span><span class="status s-todo">À faire</span></span>
+        <span class="col-prio"><span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span></span>
+        <span class="col-effort"><span class="effort">S</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sprint 2</span>
+        <span class="avatar av-marie" title="Marie Laurent">ML</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="5" data-module="onboarding" data-status="in_progress" data-priority="medium" data-rank="3" data-impact="2" data-sprint="2" data-assignee="lucas">
+        <span class="feature-title"><span class="bille m-onboarding"></span><span>Import de contacts depuis un fichier CSV</span></span>
+        <span class="col-module cell-soft">Onboarding</span>
+        <span><span class="status s-in_progress">En cours</span></span>
+        <span class="col-prio"><span class="prio p-medium"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Moyenne</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sprint 2</span>
+        <span class="avatar av-lucas" title="Lucas Martin">LM</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="4" data-module="onboarding" data-status="in_progress" data-priority="high" data-rank="2" data-impact="3" data-sprint="2" data-assignee="sarah">
+        <span class="feature-title"><span class="bille m-onboarding"></span><span>Checklist de démarrage guidée</span></span>
+        <span class="col-module cell-soft">Onboarding</span>
+        <span><span class="status s-in_progress">En cours</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">L</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 2</span>
+        <span class="avatar av-sarah" title="Sarah Kessler">SK</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="3" data-module="facturation" data-status="done" data-priority="critical" data-rank="1" data-impact="2" data-sprint="1" data-assignee="thomas">
+        <span class="feature-title"><span class="bille m-facturation"></span><span>Correction du calcul de TVA intracommunautaire</span></span>
+        <span class="col-module cell-soft">Facturation</span>
+        <span><span class="status s-done">Terminé</span></span>
+        <span class="col-prio"><span class="prio p-critical"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Critique</span></span></span>
+        <span class="col-effort"><span class="effort">S</span></span>
+        <span class="col-impact cell-soft">Moyen</span>
+        <span class="col-sprint cell-soft">Sprint 1</span>
+        <span class="avatar av-thomas" title="Thomas Renard">TR</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="2" data-module="facturation" data-status="done" data-priority="critical" data-rank="1" data-impact="3" data-sprint="1" data-assignee="marie">
+        <span class="feature-title"><span class="bille m-facturation"></span><span>Relance automatique des impayés</span></span>
+        <span class="col-module cell-soft">Facturation</span>
+        <span><span class="status s-done">Terminé</span></span>
+        <span class="col-prio"><span class="prio p-critical"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Critique</span></span></span>
+        <span class="col-effort"><span class="effort">L</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 1</span>
+        <span class="avatar av-marie" title="Marie Laurent">ML</span>
+      </a>
+      <a class="feature-row list-cols" href="feature.html" data-id="1" data-module="facturation" data-status="done" data-priority="high" data-rank="2" data-impact="3" data-sprint="1" data-assignee="thomas">
+        <span class="feature-title"><span class="bille m-facturation"></span><span>Export des factures en PDF</span></span>
+        <span class="col-module cell-soft">Facturation</span>
+        <span><span class="status s-done">Terminé</span></span>
+        <span class="col-prio"><span class="prio p-high"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="prio-text">Haute</span></span></span>
+        <span class="col-effort"><span class="effort">M</span></span>
+        <span class="col-impact cell-soft">Élevé</span>
+        <span class="col-sprint cell-soft">Sprint 1</span>
+        <span class="avatar av-thomas" title="Thomas Renard">TR</span>
+      </a>
+    </div>
+
+    <div class="empty-state" id="empty" hidden>
+      <h3>Aucune feature ne correspond</h3>
+      <p>Essaie d'enlever un filtre ou de changer ta recherche.</p>
+    </div>
+  </main>
+
+  <!-- Bouton flottant de capture rapide -->
+  <a class="fab" href="#nouvelle-feature" aria-label="Nouvelle feature">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    <span class="fab-label">Nouvelle feature</span>
+  </a>
+
+  <!-- Fenêtre : capture rapide / formulaire de feature -->
+  <div class="modal" id="nouvelle-feature" role="dialog" aria-modal="true" aria-labelledby="nf-title">
+    <a class="modal-backdrop" href="#" aria-label="Fermer"></a>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 id="nf-title">Nouvelle feature</h2>
+          <p class="soft small">Seuls le titre et le module sont obligatoires.</p>
+        </div>
+        <a class="btn btn-ghost btn-icon" href="#" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </a>
+      </div>
+      <form class="form-grid" onsubmit="location.hash=''; return false;">
+        <div class="field full">
+          <label class="label req" for="nf-titre">Titre</label>
+          <input class="input" id="nf-titre" placeholder="Ex. : Export des devis en PDF">
+        </div>
+        <div class="field">
+          <label class="label req" for="nf-module">Module</label>
+          <select class="select" id="nf-module">
+            <option value="">Choisir un module</option>
+            <option>Facturation</option>
+            <option>Onboarding</option>
+            <option>Dashboard</option>
+            <option>Notifications</option>
+            <option>Gestion des accès</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="nf-statut">Statut</label>
+          <select class="select" id="nf-statut">
+            <option selected>Backlog</option><option>À faire</option><option>En cours</option><option>Terminé</option><option>Annulé</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="nf-prio">Priorité</label>
+          <select class="select" id="nf-prio">
+            <option>Critique</option><option>Haute</option><option selected>Moyenne</option><option>Basse</option><option>Bonus</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="nf-impact">Impact</label>
+          <select class="select" id="nf-impact">
+            <option>Faible</option><option selected>Moyen</option><option>Élevé</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="nf-effort">Effort</label>
+          <select class="select" id="nf-effort">
+            <option value="">Non estimé</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="nf-sprint">Sprint</label>
+          <select class="select" id="nf-sprint">
+            <option selected>Sans sprint (backlog)</option><option>Sprint 2 · actif</option><option>Sprint 3 · planifié</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label class="label" for="nf-assigne">Assignée à</label>
+          <select class="select" id="nf-assigne">
+            <option value="">Personne</option><option>Marie Laurent</option><option>Thomas Renard</option><option>Sarah Kessler</option><option>Lucas Martin</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label class="label" for="nf-desc">Description</label>
+          <textarea class="textarea" id="nf-desc" placeholder="Le besoin, le contexte, ce qui serait réussi…"></textarea>
+        </div>
+        <div class="modal-foot full" style="margin-top:var(--space-3)">
+          <a class="btn btn-ghost" href="#">Annuler</a>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Prototype : filtres, recherche et tri côté navigateur, sans enregistrement.
+    const list = document.getElementById('list');
+    const rows = [...list.querySelectorAll('.feature-row')];
+    const filters = [...document.querySelectorAll('select[data-key]')];
+    const search = document.getElementById('search');
+    const sort = document.getElementById('sort');
+    const count = document.getElementById('count');
+    const empty = document.getElementById('empty');
+
+    // Filtres reçus dans l'URL (ex. : backlog.html?module=facturation depuis l'écran Modules)
+    const params = new URLSearchParams(location.search);
+    filters.forEach(f => { if (params.has(f.dataset.key)) f.value = params.get(f.dataset.key); });
+    if (params.has('q')) search.value = params.get('q');
+
+    function apply() {
+      const q = search.value.trim().toLowerCase();
+      let shown = 0;
+      rows.forEach(row => {
+        const okFilters = filters.every(f => !f.value || row.dataset[f.dataset.key] === f.value);
+        const okSearch = !q || row.querySelector('.feature-title').textContent.toLowerCase().includes(q);
+        row.hidden = !(okFilters && okSearch);
+        if (!row.hidden) shown++;
+      });
+      filters.forEach(f => f.classList.toggle('is-set', !!f.value));
+      sort.classList.toggle('is-set', sort.value !== 'recent');
+      count.textContent = shown;
+      empty.hidden = shown > 0;
+
+      const by = {
+        recent: (a, b) => b.dataset.id - a.dataset.id,
+        priority: (a, b) => a.dataset.rank - b.dataset.rank || b.dataset.impact - a.dataset.impact,
+        impact: (a, b) => b.dataset.impact - a.dataset.impact || a.dataset.rank - b.dataset.rank,
+      }[sort.value];
+      rows.slice().sort(by).forEach(r => list.appendChild(r));
+
+      const url = new URLSearchParams();
+      filters.forEach(f => f.value && url.set(f.dataset.key, f.value));
+      if (q) url.set('q', q);
+      history.replaceState(null, '', location.pathname + (url.toString() ? '?' + url : '') + location.hash);
+    }
+
+    [...filters, sort].forEach(el => el.addEventListener('change', apply));
+    search.addEventListener('input', apply);
+    apply();
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprints · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="backlog.html"><span class="logo-mark" aria-hidden="true"></span><span>Roadmap</span></a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="backlog.html">Backlog</a>
+        <a href="sprints.html" aria-current="page">Sprints</a>
+        <a href="modules.html">Modules</a>
+        <a href="equipe.html">Équipe</a>
+      </nav>
+      <div class="user">
+        <span class="avatar md av-marie" title="Marie Laurent">ML</span>
+        <span class="user-name">Marie Laurent</span>
+        <a class="btn btn-ghost btn-sm" href="index.html">Déconnexion</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Sprints</h1>
+        <p class="subtitle">Des périodes de travail d'une à deux semaines.</p>
+      </div>
+      <a class="btn btn-primary" href="#nouveau-sprint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Créer un sprint
+      </a>
+    </div>
+
+    <div class="grid-3">
+      <a class="card counter-card" href="sprint.html">
+        <div class="row-inline" style="justify-content:space-between">
+          <h3>Sprint 1</h3>
+          <span class="status s-completed">Terminé</span>
+        </div>
+        <p class="body-lg">Fiabiliser la facturation récurrente.</p>
+        <p class="data soft">2 nov. → 13 nov. 2026</p>
+        <div class="counter-figure"><span class="data-xl">3</span><span class="label">features</span></div>
+        <div class="progress-row">
+          <div class="progress"><span style="width:100%"></span></div>
+          <span class="data">3 / 3</span>
+        </div>
+      </a>
+
+      <a class="card counter-card" href="sprint.html">
+        <span class="band aurora"></span>
+        <div class="row-inline" style="justify-content:space-between">
+          <h3>Sprint 2</h3>
+          <span class="status s-active">Actif</span>
+        </div>
+        <p class="body-lg">Réduire l'abandon pendant l'onboarding.</p>
+        <p class="data soft">16 nov. → 27 nov. 2026</p>
+        <div class="counter-figure"><span class="data-xl">5</span><span class="label">features</span></div>
+        <div class="progress-row">
+          <div class="progress"><span style="width:20%"></span></div>
+          <span class="data">1 / 5</span>
+        </div>
+      </a>
+
+      <a class="card counter-card" href="sprint.html">
+        <div class="row-inline" style="justify-content:space-between">
+          <h3>Sprint 3</h3>
+          <span class="status s-planned">Planifié</span>
+        </div>
+        <p class="body-lg">Rendre les notifications configurables.</p>
+        <p class="data soft">30 nov. → 11 déc. 2026</p>
+        <div class="counter-figure"><span class="data-xl">2</span><span class="label">features</span></div>
+        <div class="progress-row">
+          <div class="progress empty"><span style="width:0%"></span></div>
+          <span class="data">0 / 2</span>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <!-- Fenêtre : créer un sprint -->
+  <div class="modal" id="nouveau-sprint" role="dialog" aria-modal="true" aria-labelledby="ns-title">
+    <a class="modal-backdrop" href="#" aria-label="Fermer"></a>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 id="ns-title">Créer un sprint</h2>
+          <p class="soft small">Il sera créé au statut « Planifié ».</p>
+        </div>
+        <a class="btn btn-ghost btn-icon" href="#" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </a>
+      </div>
+      <form class="form-grid" onsubmit="location.hash=''; return false;">
+        <div class="field">
+          <label class="label req" for="ns-debut">Date de début</label>
+          <input class="input" id="ns-debut" type="date" value="2026-12-14">
+        </div>
+        <div class="field">
+          <label class="label req" for="ns-fin">Date de fin</label>
+          <input class="input" id="ns-fin" type="date" value="2026-12-25">
+        </div>
+        <div class="field full">
+          <label class="label" for="ns-objectif">Objectif</label>
+          <input class="input" id="ns-objectif" placeholder="Ex. : Ouvrir la gestion des rôles aux administrateurs">
+          <span class="help">En une phrase.</span>
+        </div>
+        <div class="modal-foot full" style="margin-top:var(--space-3)">
+          <a class="btn btn-ghost" href="#">Annuler</a>
+          <button class="btn btn-primary" type="submit">Créer le sprint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

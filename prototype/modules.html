@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modules · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="backlog.html"><span class="logo-mark" aria-hidden="true"></span><span>Roadmap</span></a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="backlog.html">Backlog</a>
+        <a href="sprints.html">Sprints</a>
+        <a href="modules.html" aria-current="page">Modules</a>
+        <a href="equipe.html">Équipe</a>
+      </nav>
+      <div class="user">
+        <span class="avatar md av-marie" title="Marie Laurent">ML</span>
+        <span class="user-name">Marie Laurent</span>
+        <a class="btn btn-ghost btn-sm" href="index.html">Déconnexion</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Modules</h1>
+        <p class="subtitle">Les grandes parties du produit, chacune avec sa couleur.</p>
+      </div>
+      <a class="btn btn-primary" href="#module">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouveau module
+      </a>
+    </div>
+
+    <div class="grid-3">
+      <article class="card counter-card m-facturation">
+        <span class="band"></span>
+        <a class="module" href="backlog.html?module=facturation"><span class="bille lg"></span><h3>Facturation</h3></a>
+        <p class="soft">Devis, factures, relances et paiements.</p>
+        <div class="counter-figure"><span class="data-xl">3</span><span class="label">features</span></div>
+        <div class="row-inline" style="justify-content:space-between">
+          <a class="btn btn-secondary btn-sm" href="backlog.html?module=facturation">Voir les features →</a>
+          <a class="btn btn-ghost btn-sm" href="#module">Modifier</a>
+        </div>
+      </article>
+
+      <article class="card counter-card m-onboarding">
+        <span class="band"></span>
+        <a class="module" href="backlog.html?module=onboarding"><span class="bille lg"></span><h3>Onboarding</h3></a>
+        <p class="soft">Les premiers pas des nouveaux clients, de l'inscription à la première facture.</p>
+        <div class="counter-figure"><span class="data-xl">4</span><span class="label">features</span></div>
+        <div class="row-inline" style="justify-content:space-between">
+          <a class="btn btn-secondary btn-sm" href="backlog.html?module=onboarding">Voir les features →</a>
+          <a class="btn btn-ghost btn-sm" href="#module">Modifier</a>
+        </div>
+      </article>
+
+      <article class="card counter-card m-dashboard">
+        <span class="band"></span>
+        <a class="module" href="backlog.html?module=dashboard"><span class="bille lg"></span><h3>Dashboard</h3></a>
+        <p class="soft">Indicateurs et graphiques pour suivre l'activité.</p>
+        <div class="counter-figure"><span class="data-xl">3</span><span class="label">features</span></div>
+        <div class="row-inline" style="justify-content:space-between">
+          <a class="btn btn-secondary btn-sm" href="backlog.html?module=dashboard">Voir les features →</a>
+          <a class="btn btn-ghost btn-sm" href="#module">Modifier</a>
+        </div>
+      </article>
+
+      <article class="card counter-card m-notifications">
+        <span class="band"></span>
+        <a class="module" href="backlog.html?module=notifications"><span class="bille lg"></span><h3>Notifications</h3></a>
+        <p class="soft">E-mails, alertes et rappels envoyés aux utilisateurs.</p>
+        <div class="counter-figure"><span class="data-xl">3</span><span class="label">features</span></div>
+        <div class="row-inline" style="justify-content:space-between">
+          <a class="btn btn-secondary btn-sm" href="backlog.html?module=notifications">Voir les features →</a>
+          <a class="btn btn-ghost btn-sm" href="#module">Modifier</a>
+        </div>
+      </article>
+
+      <article class="card counter-card m-acces">
+        <span class="band"></span>
+        <a class="module" href="backlog.html?module=acces"><span class="bille lg"></span><h3>Gestion des accès</h3></a>
+        <p class="soft">Comptes, rôles, permissions et sécurité de connexion.</p>
+        <div class="counter-figure"><span class="data-xl">3</span><span class="label">features</span></div>
+        <div class="row-inline" style="justify-content:space-between">
+          <a class="btn btn-secondary btn-sm" href="backlog.html?module=acces">Voir les features →</a>
+          <a class="btn btn-ghost btn-sm" href="#module">Modifier</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <!-- Fenêtre : créer ou modifier un module -->
+  <div class="modal" id="module" role="dialog" aria-modal="true" aria-labelledby="mo-title">
+    <a class="modal-backdrop" href="#" aria-label="Fermer"></a>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 id="mo-title">Module</h2>
+          <p class="soft small">Le nom doit être unique.</p>
+        </div>
+        <a class="btn btn-ghost btn-icon" href="#" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </a>
+      </div>
+      <form class="form-grid" onsubmit="location.hash=''; return false;">
+        <div class="field full">
+          <label class="label req" for="mo-nom">Nom</label>
+          <input class="input" id="mo-nom" placeholder="Ex. : Facturation">
+        </div>
+        <div class="field full">
+          <span class="label req" id="mo-couleur">Couleur</span>
+          <div class="swatches" role="radiogroup" aria-labelledby="mo-couleur">
+            <input type="radio" name="couleur" id="c1" checked><label for="c1" style="--c:var(--module-lilas)" title="Lilas"></label>
+            <input type="radio" name="couleur" id="c2"><label for="c2" style="--c:var(--module-menthe)" title="Menthe"></label>
+            <input type="radio" name="couleur" id="c3"><label for="c3" style="--c:var(--module-peche)" title="Pêche"></label>
+            <input type="radio" name="couleur" id="c4"><label for="c4" style="--c:var(--module-beurre)" title="Beurre"></label>
+            <input type="radio" name="couleur" id="c5"><label for="c5" style="--c:var(--module-ciel)" title="Ciel"></label>
+            <input type="radio" name="couleur" id="c6"><label for="c6" style="--c:var(--module-rose)" title="Rose"></label>
+            <input type="radio" name="couleur" id="c7"><label for="c7" style="--c:var(--module-sauge)" title="Sauge"></label>
+            <input type="radio" name="couleur" id="c8"><label for="c8" style="--c:var(--module-corail)" title="Corail"></label>
+          </div>
+        </div>
+        <div class="field full">
+          <label class="label" for="mo-desc">Description</label>
+          <textarea class="textarea" id="mo-desc" placeholder="À quoi sert ce module ?"></textarea>
+        </div>
+        <div class="modal-foot full" style="margin-top:var(--space-3)">
+          <a class="btn btn-ghost" href="#">Annuler</a>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

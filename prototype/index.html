@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="login">
+    <!-- Formes décoratives en pâte à modeler -->
+    <span class="blob" aria-hidden="true" style="width:340px;height:340px;left:-90px;top:-80px;background:var(--module-lilas)"></span>
+    <span class="blob" aria-hidden="true" style="width:220px;height:220px;right:-40px;top:18%;background:var(--module-menthe)"></span>
+    <span class="blob" aria-hidden="true" style="width:280px;height:280px;right:12%;bottom:-120px;background:var(--module-peche)"></span>
+    <span class="blob" aria-hidden="true" style="width:120px;height:120px;left:14%;bottom:12%;background:var(--module-beurre)"></span>
+
+    <div class="card login-card">
+      <div class="login-brand">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <div>
+          <h1 class="display">Roadmap</h1>
+          <p class="soft body-lg">Capturer, ranger, planifier. En équipe.</p>
+        </div>
+      </div>
+
+      <form class="stack" style="gap:var(--space-5)" action="backlog.html" method="get" onsubmit="location.href='backlog.html'; return false;">
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input class="input" id="email" type="email" placeholder="prenom.nom@entreprise.fr" value="marie.laurent@entreprise.fr" autocomplete="username">
+        </div>
+        <div class="field">
+          <label class="label" for="password">Mot de passe</label>
+          <input class="input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" style="margin-top:var(--space-3)">Se connecter</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
