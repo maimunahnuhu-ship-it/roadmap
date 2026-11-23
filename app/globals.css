@@ -1,4 +1,11 @@
 @import "tailwindcss";
+/* Animations d'ouverture/fermeture utilisées par les composants shadcn/ui (Dialog) */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Le mode sombre n'est activé que par une classe .dark (jamais utilisée pour l'instant) :
+   on évite ainsi que les styles « dark: » de shadcn s'appliquent selon le système. */
+@custom-variant dark (&:is(.dark *));
 
 /*
   Tokens du design system (docs/design-system.md), traduits pour Tailwind CSS v4.
@@ -165,6 +172,35 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.45; transform: scale(0.8); }
   }
+}
+
+/* Noms attendus par les composants shadcn/ui, reliés aux tokens du design system.
+   « inline » : la classe utilise directement la variable de notre token. */
+@theme inline {
+  --color-foreground: var(--color-ink);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-on-accent);
+  --color-secondary: var(--color-accent-soft);
+  --color-secondary-foreground: var(--color-accent);
+  --color-muted: var(--color-surface-sunken);
+  --color-muted-foreground: var(--color-ink-soft);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-ink);
+  --color-input: var(--color-surface-sunken);
+  --color-ring: var(--color-accent);
+  --color-destructive: var(--color-danger);
+  --font-sans: var(--font-text);
+  --font-heading: var(--font-title);
+}
+
+/* Reflet clair des pastilles de module (« billes ») : la couleur du module
+   est ajoutée par-dessous, car elle vient de la base. */
+@utility bille {
+  border-radius: var(--radius-full);
+  background-image: radial-gradient(circle at 30% 30%, rgb(255 255 255 / 0.8), transparent 55%);
+  box-shadow: 0 2px 4px rgb(76 60 170 / 0.18);
 }
 
 /* Dégradé « aurora » : la signature futuriste, réservée à la progression,
