@@ -1,26 +1,193 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+  Tokens du design system (docs/design-system.md), traduits pour Tailwind CSS v4.
+  Chaque variable déclarée dans @theme crée des classes utilitaires :
+    --color-accent       → bg-accent, text-accent, border-accent…
+    --text-h1            → text-h1 (taille + interligne + graisse)
+    --radius-xl          → rounded-xl
+    --shadow-clay        → shadow-clay
+  On vide d'abord les valeurs par défaut de Tailwind (couleurs, tailles de texte,
+  arrondis, ombres, polices) pour n'utiliser QUE les tokens du design system.
+*/
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --font-*: initial;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* ---------- Couleurs : fonds et surfaces ---------- */
+  --color-background: #F4F1FF;      /* fond de page, lavande très pâle */
+  --color-surface: #FFFFFF;         /* cartes, modales, menus */
+  --color-surface-sunken: #ECE8FB;  /* intérieur creusé des champs, piste de progression */
+  --color-surface-hover: #F0EDFC;   /* champ survolé */
+  --color-surface-tint: #F8F6FF;    /* bulles de commentaire, lignes à cocher */
+  --color-border: #E3DEF7;          /* séparateurs fins, contour des boutons secondaires */
+  --color-overlay: rgb(31 26 61 / 0.32); /* voile derrière une modale */
+
+  /* ---------- Couleurs : texte ---------- */
+  --color-ink: #1F1A3D;        /* texte principal, titres */
+  --color-ink-soft: #5B557A;   /* texte secondaire, libellés */
+  --color-ink-muted: #8A84A8;  /* placeholders et icônes décoratives uniquement */
+  --color-on-accent: #FFFFFF;  /* texte sur bouton principal ou danger */
+
+  /* ---------- Couleurs : accent et lumière ---------- */
+  --color-accent: #6C5CF5;        /* couleur de marque */
+  --color-accent-hover: #5E4DEB;  /* survol du bouton principal */
+  --color-accent-edge: #4A3BC9;   /* épaisseur « Bonbon » sous le bouton principal */
+  --color-accent-soft: #E9E5FF;   /* élément sélectionné, survol léger */
+  --color-aurora-start: #8B7BFF;  /* dégradé aurora : début */
+  --color-aurora-middle: #5FC8FF; /* dégradé aurora : milieu */
+  --color-aurora-end: #6EE7C5;    /* dégradé aurora : fin */
+
+  /* ---------- Couleurs : sémantique ---------- */
+  --color-danger: #D92D55;
+  --color-danger-soft: #FFE4EA;
+  --color-danger-edge: #A81E3F;
+
+  /* ---------- Couleurs : statuts de feature (texte + fond « soft ») ---------- */
+  --color-status-backlog: #5E5A7A;
+  --color-status-backlog-soft: #EEECF5;
+  --color-status-todo: #245E9C;
+  --color-status-todo-soft: #DDEEFF;
+  --color-status-in-progress: #8A5600;
+  --color-status-in-progress-soft: #FFF1C7;
+  --color-status-done: #187048;
+  --color-status-done-soft: #D6F5E7;
+  --color-status-cancelled: #8E4459;
+  --color-status-cancelled-soft: #F6E3E8;
+
+  /* ---------- Couleurs : statuts de sprint ---------- */
+  --color-sprint-planned: #5443D9;
+  --color-sprint-planned-soft: #E9E5FF;
+  --color-sprint-active: #245E9C;
+  --color-sprint-active-soft: #DDEEFF;
+  --color-sprint-completed: #187048;
+  --color-sprint-completed-soft: #D6F5E7;
+
+  /* ---------- Couleurs : priorités ---------- */
+  --color-priority-critical: #C2254A;
+  --color-priority-critical-soft: #FFE1E7;
+  --color-priority-high: #A04F00;
+  --color-priority-high-soft: #FFEBD6;
+  --color-priority-medium: #5443D9;
+  --color-priority-medium-soft: #E9E5FF;
+  --color-priority-low: #1F6E9E;
+  --color-priority-low-soft: #DDF0FB;
+  --color-priority-nice-to-have: #625D84;
+  --color-priority-nice-to-have-soft: #F1EFF7;
+
+  /* ---------- Couleurs : modules (valeurs proposées pour modules.color) ---------- */
+  --color-module-lilas: #B9A8FF;
+  --color-module-menthe: #8FE3C0;
+  --color-module-peche: #FFC29E;
+  --color-module-beurre: #FFE07A;
+  --color-module-ciel: #9CD3FF;
+  --color-module-rose: #FFA8C5;
+  --color-module-sauge: #B5D99C;
+  --color-module-corail: #FF9C8A;
+
+  /* ---------- Typographie : familles ---------- */
+  /* Les variables --font-fredoka, --font-nunito et --font-space-grotesk
+     sont créées par next/font dans app/layout.tsx. */
+  --font-title: var(--font-fredoka), system-ui, sans-serif;     /* titres */
+  --font-text: var(--font-nunito), system-ui, sans-serif;       /* texte, boutons */
+  --font-data: var(--font-space-grotesk), ui-monospace, monospace; /* chiffres, dates */
+
+  /* ---------- Typographie : échelle (taille, interligne, graisse) ---------- */
+  --text-display: 40px;
+  --text-display--line-height: 48px;
+  --text-display--font-weight: 600;
+  --text-h1: 32px;
+  --text-h1--line-height: 40px;
+  --text-h1--font-weight: 600;
+  --text-h2: 24px;
+  --text-h2--line-height: 32px;
+  --text-h2--font-weight: 600;
+  --text-h3: 19px;
+  --text-h3--line-height: 26px;
+  --text-h3--font-weight: 500;
+  --text-body-lg: 17px;
+  --text-body-lg--line-height: 26px;
+  --text-body: 15px;
+  --text-body--line-height: 24px;
+  --text-small: 13px;
+  --text-small--line-height: 20px;
+  --text-small--font-weight: 600;
+  --text-label: 12px;
+  --text-label--line-height: 16px;
+  --text-label--font-weight: 800;
+  --text-label--letter-spacing: 0.06em;
+  --text-data-xl: 48px;
+  --text-data-xl--line-height: 52px;
+  --text-data-xl--font-weight: 600;
+  --text-data: 14px;
+  --text-data--line-height: 20px;
+  --text-data--font-weight: 500;
+
+  /* ---------- Espacements : base de 4 px ---------- */
+  /* p-1 = 4px, p-2 = 8px, p-4 = 16px, p-8 = 32px… (valeur × 4 px).
+     Valeurs du design system : 1, 2, 3, 4, 5, 6, 8, 10, 12, 16. */
+  --spacing: 4px;
+  --container-page: 1200px; /* largeur maximale du contenu → max-w-page */
+
+  /* ---------- Arrondis ---------- */
+  --radius-sm: 10px;   /* badges de priorité, petits éléments */
+  --radius-md: 16px;   /* champs, boutons */
+  --radius-lg: 20px;   /* cartes compactes du backlog */
+  --radius-xl: 32px;   /* cartes standard, modales */
+  --radius-full: 9999px; /* pilules, avatars, barres de progression */
+
+  /* ---------- Relief et lumière ---------- */
+  --shadow-clay: 0 12px 28px -10px rgb(76 60 170 / 0.22), 0 2px 6px rgb(76 60 170 / 0.06), inset 0 2px 0 rgb(255 255 255 / 0.9), inset 0 -4px 8px rgb(108 92 245 / 0.06);
+  --shadow-clay-sm: 0 6px 14px -6px rgb(76 60 170 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  --shadow-clay-hover: 0 18px 36px -12px rgb(76 60 170 / 0.28), 0 2px 6px rgb(76 60 170 / 0.08), inset 0 2px 0 rgb(255 255 255 / 0.9);
+  --shadow-sunken: inset 0 2px 5px rgb(76 60 170 / 0.12), inset 0 -1px 0 rgb(255 255 255 / 0.8);
+  --shadow-glow: 0 0 0 4px rgb(108 92 245 / 0.18), 0 0 24px rgb(95 200 255 / 0.35);
+  --shadow-dot: 0 0 6px currentColor; /* halo du point des badges de statut */
+  --shadow-critical: 0 0 10px rgb(255 92 122 / 0.45); /* halo du badge « Critique » */
+  /* Épaisseur « Bonbon » des boutons pleins : repos, survol, appui */
+  --shadow-edge-accent: 0 4px 0 var(--color-accent-edge), inset 0 1px 0 rgb(255 255 255 / 0.35);
+  --shadow-edge-accent-hover: 0 5px 0 var(--color-accent-edge), inset 0 1px 0 rgb(255 255 255 / 0.35);
+  --shadow-edge-accent-pressed: 0 1px 0 var(--color-accent-edge), inset 0 1px 0 rgb(255 255 255 / 0.35);
+  --shadow-edge-danger: 0 4px 0 var(--color-danger-edge), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  --shadow-edge-danger-pressed: 0 1px 0 var(--color-danger-edge), inset 0 1px 0 rgb(255 255 255 / 0.3);
+
+  /* ---------- Mouvement ---------- */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* léger rebond */
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite; /* point « En cours » */
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.8); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Dégradé « aurora » : la signature futuriste, réservée à la progression,
+   au bouton de capture rapide et au sprint actif. */
+@utility bg-aurora {
+  background-image: linear-gradient(120deg, var(--color-aurora-start) 0%, var(--color-aurora-middle) 55%, var(--color-aurora-end) 100%);
+}
+
+/* Styles de base de toute l'application */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  /* Respecte le réglage « réduire les animations » du système */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition-duration: 1ms !important;
+    }
+  }
 }
