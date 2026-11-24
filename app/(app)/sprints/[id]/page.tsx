@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeftIcon, PencilIcon, Undo2Icon } from "lucide-react";
+import { ChevronLeftIcon, PencilIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_WITH_RELATIONS } from "@/lib/queries";
-import { updateFeatureSprint } from "@/lib/actions/features";
 import { updateSprintStatus } from "@/lib/actions/sprints";
-import { FEATURE_STATUSES, FEATURE_STATUS_LABELS, SPRINT_STATUSES, SPRINT_STATUS_LABELS, toFeatureStatus } from "@/lib/constants";
+import { SPRINT_STATUSES, SPRINT_STATUS_LABELS } from "@/lib/constants";
+import { getKanbanColumns } from "@/lib/views";
 import { formatDay, sprintName } from "@/lib/format";
 import { AutoSubmitSelect } from "@/components/auto-submit-select";
 import { AddFeaturesDialog } from "@/components/add-features-dialog";
-import { CountPill, EffortChip, ModuleDot, PriorityBadge, ProgressBar, SprintStatusBadge, StatusBadge } from "@/components/badges";
-import { NobodyAvatar, PersonAvatar } from "@/components/person-avatar";
+import { ProgressBar, SprintStatusBadge } from "@/components/badges";
+import { KanbanBoard } from "@/components/kanban-board";
 import { SprintFormDialog } from "@/components/sprint-form-dialog";
 import { Button } from "@/components/ui/button";
 
@@ -41,14 +41,6 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
   const features = sprintFeatures ?? [];
   const name = sprintName(sprint.id);
   const doneCount = features.filter((feature) => feature.status === "done").length;
-
-  // Une colonne par statut ; « Backlog » et « Annulé » n'apparaissent que s'ils contiennent des features.
-  const columns = FEATURE_STATUSES.map((status) => ({
-    status,
-    items: features.filter((feature) => toFeatureStatus(feature.status) === status),
-  })).filter(
-    (column) => column.items.length > 0 || ["todo", "in_progress", "done"].includes(column.status),
-  );
 
   return (
     <>
@@ -109,60 +101,13 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
         <ProgressBar done={doneCount} total={features.length} label="Features terminées" />
       </section>
 
-      {/* Features regroupées par statut */}
-      <div className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {columns.map((column) => (
-          <section
-            key={column.status}
-            aria-label={`Colonne ${FEATURE_STATUS_LABELS[column.status]}`}
-            className="rounded-xl bg-surface/55 p-4 shadow-clay-sm"
-          >
-            <div className="flex items-center justify-between px-2 pt-2 pb-4">
-              <StatusBadge status={column.status} />
-              <CountPill count={column.items.length} />
-            </div>
-
-            {column.items.length === 0 ? (
-              <p className="px-2 pb-2 text-small text-ink-soft">Aucune feature.</p>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {column.items.map((feature) => (
-                  <li key={feature.id} className="flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-clay-sm">
-                    <Link href={`/features/${feature.id}`} className="font-bold hover:text-accent">
-                      {feature.title}
-                    </Link>
-                    <span className="inline-flex items-center gap-2 text-small">
-                      <ModuleDot color={feature.module?.color ?? "#B9A8FF"} />
-                      {feature.module?.name}
-                    </span>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <PriorityBadge priority={feature.priority} />
-                        <EffortChip effort={feature.effort} />
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {/* Retirer = remettre sprint_id à vide : la feature retourne au backlog */}
-                        <form action={updateFeatureSprint.bind(null, feature.id)}>
-                          <input type="hidden" name="sprint_id" value="" />
-                          <Button type="submit" variant="ghost" size="sm" title="Retirer du sprint (retour au backlog)">
-                            <Undo2Icon aria-hidden="true" />
-                            Retirer
-                          </Button>
-                        </form>
-                        {feature.assignee ? (
-                          <PersonAvatar person={feature.assignee} className="size-7" />
-                        ) : (
-                          <NobodyAvatar />
-                        )}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        ))}
-      </div>
+      {/* Features regroupées par statut : on les glisse d'une colonne à l'autre */}
+      <KanbanBoard
+        features={features}
+        columns={getKanbanColumns("statut", { modules: [], sprints: [] })}
+        group="statut"
+        removableFromSprint
+      />
     </>
   );
 }

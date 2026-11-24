@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { FEATURE_STATUSES } from "@/lib/constants";
+import { FEATURE_STATUSES, PRIORITIES } from "@/lib/constants";
+import { NO_SPRINT, type KanbanGroup } from "@/lib/views";
 import { commentSchema, featureSchema, type CommentValues, type FeatureValues } from "@/lib/schemas";
 
 // Server Actions des features : elles s'exécutent sur le serveur,
@@ -85,6 +86,41 @@ export async function updateFeatureSprint(featureId: number, formData: FormData)
     .update({ sprint_id: sprintId === "" ? null : sprintId })
     .eq("id", featureId);
   revalidatePath("/", "layout");
+}
+
+// Traduit « colonne d'arrivée » en changement à écrire dans la table features.
+// Renvoie null si la valeur reçue n'est pas valide.
+function toColumnChange(group: KanbanGroup, value: string) {
+  const id = z.coerce.number().int().positive().safeParse(value);
+
+  if (group === "statut") {
+    const status = z.enum(FEATURE_STATUSES).safeParse(value);
+    return status.success ? { status: status.data } : null;
+  }
+  if (group === "priorite") {
+    const priority = z.enum(PRIORITIES).safeParse(value);
+    return priority.success ? { priority: priority.data } : null;
+  }
+  if (group === "module") {
+    return id.success ? { module_id: id.data } : null;
+  }
+  // Groupe « sprint » : la colonne « Sans sprint » renvoie la feature au backlog.
+  if (value === NO_SPRINT) return { sprint_id: null };
+  return id.success ? { sprint_id: id.data } : null;
+}
+
+// Appelée par le Kanban quand on dépose une carte dans une autre colonne :
+// on met à jour le champ qui correspond au regroupement choisi.
+export async function moveFeature(featureId: number, group: KanbanGroup, value: string): Promise<ActionResult> {
+  const change = toColumnChange(group, value);
+  if (!change) return { error: "Cette colonne est inconnue." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("features").update(change).eq("id", featureId);
+  if (error) return { error: "Le déplacement n'a pas pu être enregistré." };
+
+  revalidatePath("/", "layout");
+  return { error: null };
 }
 
 export async function addComment(featureId: number, values: CommentValues): Promise<ActionResult> {
