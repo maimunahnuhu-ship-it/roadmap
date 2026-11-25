@@ -23,14 +23,21 @@ import {
 } from "@dnd-kit/core";
 import { Undo2Icon, XIcon } from "lucide-react";
 import { moveFeature, updateFeatureSprint } from "@/lib/actions/features";
+import { canEditFeature } from "@/lib/permissions";
 import { columnOf, type KanbanColumn, type KanbanGroup } from "@/lib/views";
 import { cn } from "@/lib/utils";
 import { CountPill, ModuleDot, PriorityBadge, SprintStatusBadge, StatusBadge } from "@/components/badges";
+import { ActionForm } from "@/components/action-form";
 import { featureCardClasses, FeatureCardContent, type CardFeature } from "@/components/feature-card";
 import { Button } from "@/components/ui/button";
 
+// Une carte a besoin de connaître la personne assignée pour savoir si on peut la déplacer.
+type KanbanFeature = CardFeature & { assigned_to: string | null };
+
 type KanbanBoardProps = {
-  features: CardFeature[];
+  features: KanbanFeature[];
+  // Membre connecté (id et rôle lus côté serveur dans profiles)
+  viewer: { id: string; role: string } | null;
   columns: KanbanColumn[];
   group: KanbanGroup;
   // Dans le détail d'un sprint : un bouton sur chaque carte la renvoie au backlog.
@@ -63,7 +70,7 @@ const detectColumn: CollisionDetection = (args) => {
   return underPointer.length > 0 ? underPointer : rectIntersection(args);
 };
 
-export function KanbanBoard({ features, columns, group, removableFromSprint = false }: KanbanBoardProps) {
+export function KanbanBoard({ features, viewer, columns, group, removableFromSprint = false }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -159,6 +166,8 @@ export function KanbanBoard({ features, columns, group, removableFromSprint = fa
                     feature={feature}
                     showStatus={group !== "statut"}
                     removableFromSprint={removableFromSprint}
+                    // Même règle que la RLS : un admin, ou la personne assignée.
+                    canMove={canEditFeature(viewer, feature)}
                   />
                 ))}
               </Column>
@@ -247,15 +256,19 @@ function KanbanCard({
   feature,
   showStatus,
   removableFromSprint,
+  canMove,
 }: {
   feature: CardFeature;
   showStatus: boolean;
   removableFromSprint: boolean;
+  canMove: boolean;
 }) {
   const router = useRouter();
+  // disabled : la carte reste cliquable mais ne peut plus être déplacée.
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: feature.id,
-    attributes: { roleDescription: "carte déplaçable" },
+    disabled: !canMove,
+    attributes: { roleDescription: canMove ? "carte déplaçable" : "carte" },
   });
   const openDetail = () => router.push(`/features/${feature.id}`);
 
@@ -270,18 +283,19 @@ function KanbanCard({
           if (event.key === "Enter" && !isDragging) openDetail();
           else listeners?.onKeyDown?.(event);
         }}
-        className={cn(featureCardClasses, "cursor-grab", isDragging && "opacity-40")}
+        title={canMove ? undefined : "Seuls un admin ou la personne assignée peuvent déplacer cette carte"}
+        className={cn(featureCardClasses, canMove ? "cursor-grab" : "cursor-pointer", isDragging && "opacity-40")}
       >
         <FeatureCardContent
           feature={feature}
           showStatus={showStatus}
-          titleClassName={removableFromSprint ? "pr-9" : undefined}
+          titleClassName={removableFromSprint && canMove ? "pr-9" : undefined}
         />
       </div>
 
       {/* Retirer = remettre sprint_id à vide : la feature retourne au backlog */}
-      {removableFromSprint && (
-        <form action={updateFeatureSprint.bind(null, feature.id)} className="absolute top-2 right-2">
+      {removableFromSprint && canMove && (
+        <ActionForm action={updateFeatureSprint.bind(null, feature.id)} className="absolute top-2 right-2 flex flex-col items-end">
           <input type="hidden" name="sprint_id" value="" />
           <Button
             type="submit"
@@ -293,7 +307,7 @@ function KanbanCard({
           >
             <Undo2Icon aria-hidden="true" />
           </Button>
-        </form>
+        </ActionForm>
       )}
     </li>
   );

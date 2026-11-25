@@ -51,3 +51,11 @@ export const moduleSchema = z.object({
   description: z.string().trim(),
 });
 export type ModuleValues = z.infer<typeof moduleSchema>;
+
+// Page « Mon profil » : seuls le prénom et le nom sont modifiables
+// (le rôle n'est jamais envoyé par le formulaire).
+export const profileSchema = z.object({
+  firstname: z.string().trim().min(1, "Le prénom est obligatoire").max(50, "50 caractères au maximum"),
+  lastname: z.string().trim().min(1, "Le nom est obligatoire").max(50, "50 caractères au maximum"),
+});
+export type ProfileValues = z.infer<typeof profileSchema>;

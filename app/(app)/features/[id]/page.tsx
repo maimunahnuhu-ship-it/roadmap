@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeftIcon, PencilIcon, Undo2Icon } from "lucide-react";
+import { ChevronLeftIcon, LockIcon, PencilIcon, Undo2Icon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_WITH_RELATIONS, getCurrentProfile, getFormOptions } from "@/lib/queries";
 import { updateFeatureAssignee, updateFeatureSprint, updateFeatureStatus } from "@/lib/actions/features";
+import { canEditComment, canEditFeature } from "@/lib/permissions";
 import {
   EFFORTS,
   FEATURE_STATUSES,
@@ -17,11 +18,14 @@ import {
 } from "@/lib/constants";
 import { formatDateTime, fullName, sprintName } from "@/lib/format";
 import type { FeatureValues } from "@/lib/schemas";
+import { ActionForm } from "@/components/action-form";
 import { AutoSubmitSelect } from "@/components/auto-submit-select";
 import { CountPill, EffortChip, ModuleDot, PriorityBadge, StatusBadge } from "@/components/badges";
+import { CommentBody } from "@/components/comment-body";
 import { CommentForm } from "@/components/comment-form";
+import { DeleteFeatureButton } from "@/components/delete-feature-button";
 import { FeatureFormDialog } from "@/components/feature-form-dialog";
-import { PersonAvatar } from "@/components/person-avatar";
+import { NobodyAvatar, PersonAvatar } from "@/components/person-avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +43,7 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
     supabase
       .from("features")
       .select(
-        `${FEATURE_WITH_RELATIONS}, comments(id, content, created_at, author:profiles(id, firstname, lastname, email, avatar_url))`,
+        `${FEATURE_WITH_RELATIONS}, comments(id, content, created_at, author_id, author:profiles(id, firstname, lastname, email, avatar_url))`,
       )
       .eq("id", featureId)
       // Commentaires du plus ancien au plus récent
@@ -54,6 +58,9 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
   if (!feature) notFound();
 
   const currentStatus = toFeatureStatus(feature.status);
+  // Même règle que la RLS : un admin, ou la personne assignée.
+  // Sinon la feature s'affiche en lecture seule.
+  const canEdit = canEditFeature(currentProfile, feature);
 
   // Valeurs pré-remplies du formulaire « Modifier » (tout en texte, comme les listes).
   const formValues: FeatureValues = {
@@ -89,32 +96,40 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
           </h1>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          {feature.sprint_id && (
-            <form action={updateFeatureSprint.bind(null, feature.id)}>
-              <input type="hidden" name="sprint_id" value="" />
-              <Button type="submit" variant="ghost">
-                <Undo2Icon aria-hidden="true" />
-                Renvoyer au backlog
-              </Button>
-            </form>
-          )}
-          <FeatureFormDialog
-            options={options}
-            feature={{ id: feature.id, values: formValues }}
-            trigger={
-              <Button variant="secondary">
-                <PencilIcon aria-hidden="true" />
-                Modifier
-              </Button>
-            }
-          />
-        </div>
+        {canEdit ? (
+          <div className="flex flex-wrap gap-3">
+            {feature.sprint_id && (
+              <ActionForm action={updateFeatureSprint.bind(null, feature.id)}>
+                <input type="hidden" name="sprint_id" value="" />
+                <Button type="submit" variant="ghost">
+                  <Undo2Icon aria-hidden="true" />
+                  Renvoyer au backlog
+                </Button>
+              </ActionForm>
+            )}
+            <DeleteFeatureButton featureId={feature.id} title={feature.title} commentCount={feature.comments.length} />
+            <FeatureFormDialog
+              options={options}
+              feature={{ id: feature.id, values: formValues }}
+              trigger={
+                <Button variant="secondary">
+                  <PencilIcon aria-hidden="true" />
+                  Modifier
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          <p className="inline-flex items-center gap-2 text-small text-ink-soft">
+            <LockIcon aria-hidden="true" className="size-4" />
+            Lecture seule : seuls un admin ou la personne assignée peuvent la modifier.
+          </p>
+        )}
       </div>
 
       <div className="grid items-start gap-8 lg:grid-cols-3">
         {/* Description et commentaires */}
-        <section className="rounded-xl bg-surface p-8 shadow-clay lg:col-span-2">
+        <section className="rounded-xl bg-surface p-8 shadow-clay max-sm:p-5 lg:col-span-2">
           <h2 className="mb-2 text-label uppercase text-ink-soft">Description</h2>
           <p className="text-body-lg whitespace-pre-line">
             {feature.description || <span className="text-ink-soft">Pas encore de description.</span>}
@@ -141,9 +156,14 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
                         {formatDateTime(comment.created_at)}
                       </time>
                     </div>
-                    <p className="rounded-lg rounded-tl-sm bg-surface-tint px-4 py-3 whitespace-pre-line">
-                      {comment.content}
-                    </p>
+                    <div className="rounded-lg rounded-tl-sm bg-surface-tint px-4 py-3">
+                      {/* « Modifier » n'apparaît que pour l'auteur (même règle que la RLS) */}
+                      <CommentBody
+                        commentId={comment.id}
+                        content={comment.content}
+                        editable={canEditComment(currentProfile, comment)}
+                      />
+                    </div>
                   </div>
                 </li>
               ))}
@@ -156,28 +176,34 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
           </div>
         </section>
 
-        {/* Champs de la feature et changements rapides */}
+        {/* Champs de la feature et changements rapides (seulement si on a le droit) */}
         <aside className="flex flex-col gap-6 rounded-xl bg-surface p-6 shadow-clay">
           <div className="flex flex-col gap-2">
             <h2 className="text-label uppercase text-ink-soft">Statut</h2>
-            {/* Chaque statut est un bouton qui envoie sa valeur à la Server Action */}
-            <form action={updateFeatureStatus.bind(null, feature.id)} className="flex flex-wrap gap-2">
-              {FEATURE_STATUSES.map((status) => (
-                <button
-                  key={status}
-                  type="submit"
-                  name="status"
-                  value={status}
-                  aria-pressed={status === currentStatus}
-                  className={cn(
-                    "cursor-pointer rounded-full transition duration-150 ease-bounce outline-none hover:-translate-y-px focus-visible:shadow-glow",
-                    status === currentStatus ? "ring-2 ring-accent ring-offset-2 ring-offset-surface" : "opacity-60 hover:opacity-100",
-                  )}
-                >
-                  <StatusBadge status={status} />
-                </button>
-              ))}
-            </form>
+            {canEdit ? (
+              // Chaque statut est un bouton qui envoie sa valeur à la Server Action
+              <ActionForm action={updateFeatureStatus.bind(null, feature.id)} className="flex flex-wrap gap-2">
+                {FEATURE_STATUSES.map((status) => (
+                  <button
+                    key={status}
+                    type="submit"
+                    name="status"
+                    value={status}
+                    aria-pressed={status === currentStatus}
+                    className={cn(
+                      "cursor-pointer rounded-full transition duration-150 ease-bounce outline-none hover:-translate-y-px focus-visible:shadow-glow",
+                      status === currentStatus ? "ring-2 ring-accent ring-offset-2 ring-offset-surface" : "opacity-60 hover:opacity-100",
+                    )}
+                  >
+                    <StatusBadge status={status} />
+                  </button>
+                ))}
+              </ActionForm>
+            ) : (
+              <span>
+                <StatusBadge status={currentStatus} />
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -200,39 +226,56 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
             </div>
           </div>
 
-          {/* key : recrée le formulaire quand la valeur change, pour que la liste affiche la valeur enregistrée */}
-          <form key={feature.sprint_id ?? "none"} action={updateFeatureSprint.bind(null, feature.id)} className="flex flex-col gap-2">
-            <label htmlFor="sprint_id" className="text-label uppercase text-ink-soft">
-              Sprint
-            </label>
-            <AutoSubmitSelect id="sprint_id" name="sprint_id" defaultValue={feature.sprint_id ? String(feature.sprint_id) : ""}>
-              <option value="">Sans sprint (backlog)</option>
-              {options.sprints.map((sprint) => (
-                <option key={sprint.id} value={String(sprint.id)}>
-                  {sprintName(sprint.id)} · {SPRINT_STATUS_LABELS[toSprintStatus(sprint.status)].toLowerCase()}
-                </option>
-              ))}
-            </AutoSubmitSelect>
-            {feature.sprint_id && (
-              <Link href={`/sprints/${feature.sprint_id}`} className="text-small text-accent hover:underline">
-                Voir le {sprintName(feature.sprint_id).toLowerCase()} →
-              </Link>
-            )}
-          </form>
+          {canEdit ? (
+            // key : recrée le formulaire quand la valeur change, pour que la liste affiche la valeur enregistrée
+            <ActionForm key={feature.sprint_id ?? "none"} action={updateFeatureSprint.bind(null, feature.id)} className="flex flex-col gap-2">
+              <label htmlFor="sprint_id" className="text-label uppercase text-ink-soft">
+                Sprint
+              </label>
+              <AutoSubmitSelect id="sprint_id" name="sprint_id" defaultValue={feature.sprint_id ? String(feature.sprint_id) : ""}>
+                <option value="">Sans sprint (backlog)</option>
+                {options.sprints.map((sprint) => (
+                  <option key={sprint.id} value={String(sprint.id)}>
+                    {sprintName(sprint.id)} · {SPRINT_STATUS_LABELS[toSprintStatus(sprint.status)].toLowerCase()}
+                  </option>
+                ))}
+              </AutoSubmitSelect>
+            </ActionForm>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <h2 className="text-label uppercase text-ink-soft">Sprint</h2>
+              <span className="font-bold">{feature.sprint_id ? sprintName(feature.sprint_id) : "Sans sprint (backlog)"}</span>
+            </div>
+          )}
+          {feature.sprint_id && (
+            <Link href={`/sprints/${feature.sprint_id}`} className="-mt-4 text-small text-accent hover:underline">
+              Voir le {sprintName(feature.sprint_id).toLowerCase()} →
+            </Link>
+          )}
 
-          <form key={feature.assigned_to ?? "none"} action={updateFeatureAssignee.bind(null, feature.id)} className="flex flex-col gap-2">
-            <label htmlFor="assigned_to" className="text-label uppercase text-ink-soft">
-              Assignée à
-            </label>
-            <AutoSubmitSelect id="assigned_to" name="assigned_to" defaultValue={feature.assigned_to ?? ""}>
-              <option value="">Personne</option>
-              {options.profiles.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {fullName(profile)}
-                </option>
-              ))}
-            </AutoSubmitSelect>
-          </form>
+          {canEdit ? (
+            <ActionForm key={feature.assigned_to ?? "none"} action={updateFeatureAssignee.bind(null, feature.id)} className="flex flex-col gap-2">
+              <label htmlFor="assigned_to" className="text-label uppercase text-ink-soft">
+                Assignée à
+              </label>
+              <AutoSubmitSelect id="assigned_to" name="assigned_to" defaultValue={feature.assigned_to ?? ""}>
+                <option value="">Personne</option>
+                {options.profiles.map((profile) => (
+                  <option key={profile.id} value={profile.id}>
+                    {fullName(profile)}
+                  </option>
+                ))}
+              </AutoSubmitSelect>
+            </ActionForm>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <h2 className="text-label uppercase text-ink-soft">Assignée à</h2>
+              <span className="inline-flex items-center gap-2 font-bold">
+                {feature.assignee ? <PersonAvatar person={feature.assignee} className="size-7" /> : <NobodyAvatar />}
+                {feature.assignee ? fullName(feature.assignee) : "Personne"}
+              </span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1">
             <h2 className="text-label uppercase text-ink-soft">Créée le</h2>

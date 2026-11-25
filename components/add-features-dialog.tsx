@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ModuleDot, PriorityBadge } from "@/components/badges";
+import { FieldError } from "@/components/field-error";
 
 type BacklogFeature = {
   id: number;
@@ -35,17 +36,25 @@ export function AddFeaturesDialog({
   backlog: BacklogFeature[];
 }) {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      await addFeaturesToSprint(sprintId, formData);
-      setOpen(false);
+      const result = await addFeaturesToSprint(sprintId, formData);
+      // En cas de refus, la fenêtre reste ouverte avec le message.
+      if (result.error) setError(result.error);
+      else setOpen(false);
     });
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen) setError(null);
+    setOpen(nextOpen);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <PlusIcon aria-hidden="true" />
@@ -55,11 +64,13 @@ export function AddFeaturesDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ajouter au {sprintLabel.toLowerCase()}</DialogTitle>
-          <DialogDescription>Features du backlog, sans sprint.</DialogDescription>
+          <DialogDescription>
+            Features du backlog, sans sprint, que tu as le droit de déplacer.
+          </DialogDescription>
         </DialogHeader>
 
         {backlog.length === 0 ? (
-          <p className="text-ink-soft">Toutes les features sont déjà dans un sprint.</p>
+          <p className="text-ink-soft">Aucune feature du backlog que tu peux ajouter.</p>
         ) : (
           <form action={handleSubmit} className="flex flex-col gap-6">
             <fieldset className="flex flex-col gap-2">
@@ -76,6 +87,7 @@ export function AddFeaturesDialog({
                 </label>
               ))}
             </fieldset>
+            <FieldError message={error ?? undefined} />
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="ghost">

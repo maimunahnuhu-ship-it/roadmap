@@ -22,6 +22,7 @@ import {
   toView,
   type View,
 } from "@/lib/views";
+import { isAdmin } from "@/lib/permissions";
 import { AutoSubmitSelect } from "@/components/auto-submit-select";
 import { FeatureFormDialog } from "@/components/feature-form-dialog";
 import { FeatureGallery } from "@/components/feature-gallery";
@@ -39,7 +40,7 @@ function firstValue(value: string | string[] | undefined) {
 }
 
 // Colonnes chargées : la feature, puis ses commentaires avec leur auteur (utiles au Fil).
-const FEATURE_WITH_COMMENTS = `${FEATURE_WITH_RELATIONS}, comments(id, content, created_at, author:profiles(id, firstname, lastname, email, avatar_url))`;
+const FEATURE_WITH_COMMENTS = `${FEATURE_WITH_RELATIONS}, comments(id, content, created_at, author_id, author:profiles(id, firstname, lastname, email, avatar_url))`;
 
 // Écran 1 — Backlog : toutes les features, avec filtres, recherche et tri,
 // affichées en Liste, Kanban, Galerie ou Fil. Filtres et vue sont dans l'adresse
@@ -95,7 +96,9 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
   // Le Fil ne charge que les premiers posts (les plus récents).
   if (view === "fil") query = query.limit(feedLimit);
 
-  const [{ data, error, count }, options] = await Promise.all([query, getFormOptions()]);
+  const [{ data, error, count }, options, viewer] = await Promise.all([query, getFormOptions(), getCurrentProfile()]);
+  // Policy « Admins can insert features » : seul un admin voit les boutons de création.
+  const canCreate = isAdmin(viewer);
   const features = data ?? [];
   const total = count ?? features.length;
 
@@ -121,15 +124,17 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
             {total > 1 ? "s" : ""} trouvée{total > 1 ? "s" : ""}
           </p>
         </div>
-        <FeatureFormDialog
-          options={options}
-          trigger={
-            <Button>
-              <PlusIcon aria-hidden="true" />
-              Nouvelle feature
-            </Button>
-          }
-        />
+        {canCreate && (
+          <FeatureFormDialog
+            options={options}
+            trigger={
+              <Button>
+                <PlusIcon aria-hidden="true" />
+                Nouvelle feature
+              </Button>
+            }
+          />
+        )}
       </div>
 
       <div className="mb-6">
@@ -243,7 +248,7 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
           <p>Essaie d&apos;enlever un filtre ou de changer ta recherche.</p>
         </div>
       ) : view === "kanban" ? (
-        <KanbanBoard features={features} columns={getKanbanColumns(group, options)} group={group} />
+        <KanbanBoard features={features} viewer={viewer} columns={getKanbanColumns(group, options)} group={group} />
       ) : view === "galerie" ? (
         <FeatureGallery features={features} />
       ) : view === "fil" ? (
@@ -255,17 +260,19 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
         <FeatureList features={features} />
       )}
 
-      {/* Bouton flottant de capture rapide */}
-      <div className="fixed right-8 bottom-8 z-30 max-sm:right-4 max-sm:bottom-4">
-        <FeatureFormDialog
-          options={options}
-          trigger={
-            <Button variant="aurora" size="fab" aria-label="Nouvelle feature">
-              <PlusIcon aria-hidden="true" />
-            </Button>
-          }
-        />
-      </div>
+      {/* Bouton flottant de capture rapide (admin seulement) */}
+      {canCreate && (
+        <div className="fixed right-8 bottom-8 z-30 max-sm:right-4 max-sm:bottom-4">
+          <FeatureFormDialog
+            options={options}
+            trigger={
+              <Button variant="aurora" size="fab" aria-label="Nouvelle feature">
+                <PlusIcon aria-hidden="true" />
+              </Button>
+            }
+          />
+        </div>
+      )}
     </>
   );
 }

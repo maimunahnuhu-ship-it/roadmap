@@ -2,9 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { checkWrite, type ActionResult } from "@/lib/action-result";
 import { moduleSchema, type ModuleValues } from "@/lib/schemas";
-
-type ActionResult = { error: string | null };
 
 // Crée un module (moduleId = null) ou modifie un module existant.
 export async function saveModule(moduleId: number | null, values: ModuleValues): Promise<ActionResult> {
@@ -18,17 +17,16 @@ export async function saveModule(moduleId: number | null, values: ModuleValues):
   };
 
   const supabase = await createClient();
-  const { error } =
+  // .select("id") : on récupère les lignes écrites, pour repérer un refus silencieux de la RLS.
+  const result =
     moduleId === null
-      ? await supabase.from("modules").insert(row)
-      : await supabase.from("modules").update(row).eq("id", moduleId);
+      ? await supabase.from("modules").insert(row).select("id")
+      : await supabase.from("modules").update(row).eq("id", moduleId).select("id");
 
-  if (error) {
-    // 23505 : code PostgreSQL d'une valeur unique déjà utilisée (ici le nom)
-    if (error.code === "23505") return { error: "Un module porte déjà ce nom." };
-    return { error: "Le module n'a pas pu être enregistré." };
-  }
+  // 23505 : code PostgreSQL d'une valeur unique déjà utilisée (ici le nom)
+  if (result.error?.code === "23505") return { error: "Un module porte déjà ce nom." };
 
-  revalidatePath("/", "layout");
-  return { error: null };
+  const checked = checkWrite(result, "La base a refusé d'enregistrer le module (droits insuffisants).");
+  if (!checked.error) revalidatePath("/", "layout");
+  return checked;
 }

@@ -28,8 +28,15 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <NavLinks />
 
           <div className="ml-auto flex shrink-0 items-center gap-3">
-            <PersonAvatar person={profile} />
-            <span className="text-small max-md:hidden">{fullName(profile)}</span>
+            {/* Un clic sur ma photo ouvre la page « Mon profil » */}
+            <Link
+              href="/profil"
+              aria-label="Mon profil"
+              className="flex items-center gap-3 rounded-full pr-1 outline-none transition hover:text-accent focus-visible:shadow-glow"
+            >
+              <PersonAvatar person={profile} />
+              <span className="text-small max-md:hidden">{fullName(profile)}</span>
+            </Link>
             <form action={logout}>
               <Button type="submit" variant="ghost" size="sm">
                 <LogOutIcon aria-hidden="true" />

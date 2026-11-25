@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeftIcon, PencilIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { FEATURE_WITH_RELATIONS } from "@/lib/queries";
+import { FEATURE_WITH_RELATIONS, getCurrentProfile } from "@/lib/queries";
+import { canEditFeature } from "@/lib/permissions";
 import { updateSprintStatus } from "@/lib/actions/sprints";
 import { SPRINT_STATUSES, SPRINT_STATUS_LABELS } from "@/lib/constants";
 import { getKanbanColumns } from "@/lib/views";
 import { formatDay, sprintName } from "@/lib/format";
+import { ActionForm } from "@/components/action-form";
 import { AutoSubmitSelect } from "@/components/auto-submit-select";
 import { AddFeaturesDialog } from "@/components/add-features-dialog";
 import { ProgressBar, SprintStatusBadge } from "@/components/badges";
@@ -24,16 +26,17 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
   if (!Number.isInteger(sprintId)) notFound();
 
   const supabase = await createClient();
-  const [{ data: sprint }, { data: sprintFeatures }, { data: backlog }] = await Promise.all([
+  const [{ data: sprint }, { data: sprintFeatures }, { data: backlog }, viewer] = await Promise.all([
     supabase.from("sprints").select("*").eq("id", sprintId).maybeSingle(),
     supabase.from("features").select(FEATURE_WITH_RELATIONS).eq("sprint_id", sprintId).order("created_at"),
     // Features sans sprint, proposées dans « Ajouter depuis le backlog »
     supabase
       .from("features")
-      .select("id, title, priority, module:modules(color)")
+      .select("id, title, priority, assigned_to, module:modules(color)")
       .is("sprint_id", null)
       .neq("status", "cancelled")
       .order("created_at", { ascending: false }),
+    getCurrentProfile(),
   ]);
 
   if (!sprint) notFound();
@@ -63,7 +66,7 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
 
         <div className="flex flex-wrap items-center gap-3">
           {/* key : recrée le formulaire après un changement, pour afficher le statut enregistré */}
-          <form key={sprint.status} action={updateSprintStatus.bind(null, sprint.id)}>
+          <ActionForm key={sprint.status} action={updateSprintStatus.bind(null, sprint.id)}>
             <AutoSubmitSelect variant="chip" name="status" defaultValue={sprint.status} aria-label="Statut du sprint">
               {SPRINT_STATUSES.map((status) => (
                 <option key={status} value={status}>
@@ -71,7 +74,7 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
                 </option>
               ))}
             </AutoSubmitSelect>
-          </form>
+          </ActionForm>
           <SprintFormDialog
             sprint={{
               id: sprint.id,
@@ -85,7 +88,12 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
               </Button>
             }
           />
-          <AddFeaturesDialog sprintId={sprint.id} sprintLabel={name} backlog={backlog ?? []} />
+          {/* On ne propose que les features que la RLS autorise à déplacer */}
+          <AddFeaturesDialog
+            sprintId={sprint.id}
+            sprintLabel={name}
+            backlog={(backlog ?? []).filter((feature) => canEditFeature(viewer, feature))}
+          />
         </div>
       </div>
 
@@ -104,6 +112,7 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
       {/* Features regroupées par statut : on les glisse d'une colonne à l'autre */}
       <KanbanBoard
         features={features}
+        viewer={viewer}
         columns={getKanbanColumns("statut", { modules: [], sprints: [] })}
         group="statut"
         removableFromSprint

@@ -1,16 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_STATUSES, PRIORITIES } from "@/lib/constants";
 import { NO_SPRINT, type KanbanGroup } from "@/lib/views";
+import { checkWrite, type ActionResult } from "@/lib/action-result";
 import { commentSchema, featureSchema, type CommentValues, type FeatureValues } from "@/lib/schemas";
 
 // Server Actions des features : elles s'exécutent sur le serveur,
 // valident les données avec zod puis écrivent dans Supabase.
+// La RLS décide qui a le droit d'écrire : chaque action renvoie
+// un message clair quand la base refuse.
 
-type ActionResult = { error: string | null };
+// Message commun quand la RLS refuse de modifier une feature.
+const FEATURE_REFUSED =
+  "Modification refusée : seuls un admin ou la personne assignée peuvent modifier cette feature.";
 
 // Convertit les valeurs du formulaire (du texte) en ligne de la table features.
 function toFeatureRow(values: FeatureValues) {
@@ -27,65 +33,86 @@ function toFeatureRow(values: FeatureValues) {
   };
 }
 
+// Écrit un changement sur une feature et vérifie qu'une ligne a bien été modifiée.
+async function updateOneFeature(
+  featureId: number,
+  change: Partial<ReturnType<typeof toFeatureRow>>,
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const result = await supabase.from("features").update(change).eq("id", featureId).select("id");
+  const checked = checkWrite(result, FEATURE_REFUSED);
+  if (!checked.error) revalidatePath("/", "layout");
+  return checked;
+}
+
 export async function createFeature(values: FeatureValues): Promise<ActionResult> {
   const parsed = featureSchema.safeParse(values);
   if (!parsed.success) return { error: "Vérifie les champs du formulaire." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("features").insert(toFeatureRow(parsed.data));
-  if (error) return { error: "La feature n'a pas pu être créée." };
-
-  revalidatePath("/", "layout");
-  return { error: null };
+  const result = await supabase.from("features").insert(toFeatureRow(parsed.data)).select("id");
+  const checked = checkWrite(result, "Création refusée : seul un admin peut créer une feature.");
+  if (!checked.error) revalidatePath("/", "layout");
+  return checked;
 }
 
 export async function updateFeature(featureId: number, values: FeatureValues): Promise<ActionResult> {
   const parsed = featureSchema.safeParse(values);
   if (!parsed.success) return { error: "Vérifie les champs du formulaire." };
-
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("features")
-    .update(toFeatureRow(parsed.data))
-    .eq("id", featureId);
-  if (error) return { error: "La feature n'a pas pu être modifiée." };
-
-  revalidatePath("/", "layout");
-  return { error: null };
+  return updateOneFeature(featureId, toFeatureRow(parsed.data));
 }
 
-// Les actions suivantes reçoivent un FormData : elles sont branchées
-// directement sur un <form action={...}>, sans JavaScript côté navigateur.
-
-export async function updateFeatureStatus(featureId: number, formData: FormData) {
-  const status = z.enum(FEATURE_STATUSES).parse(formData.get("status"));
+// Suppression : ses commentaires partent avec elle (ON DELETE CASCADE),
+// puis on retourne au Backlog.
+export async function deleteFeature(featureId: number): Promise<ActionResult> {
   const supabase = await createClient();
-  await supabase.from("features").update({ status }).eq("id", featureId);
+  const result = await supabase.from("features").delete().eq("id", featureId).select("id");
+  const checked = checkWrite(
+    result,
+    "Suppression refusée : seuls un admin ou la personne assignée peuvent supprimer cette feature.",
+  );
+  if (checked.error) return checked;
+
   revalidatePath("/", "layout");
+  redirect("/");
 }
 
-export async function updateFeatureAssignee(featureId: number, formData: FormData) {
+// Les actions suivantes sont branchées sur un formulaire (FormData) via
+// useActionState : elles reçoivent l'état précédent et renvoient le nouveau,
+// ce qui permet d'afficher le message d'erreur sous le formulaire.
+
+export async function updateFeatureStatus(
+  featureId: number,
+  _previous: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const status = z.enum(FEATURE_STATUSES).safeParse(formData.get("status"));
+  if (!status.success) return { error: "Statut inconnu." };
+  return updateOneFeature(featureId, { status: status.data });
+}
+
+export async function updateFeatureAssignee(
+  featureId: number,
+  _previous: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   // "" = personne ; sinon l'identifiant (uuid) d'un membre
-  const assignee = z.union([z.literal(""), z.uuid()]).parse(formData.get("assigned_to"));
-  const supabase = await createClient();
-  await supabase
-    .from("features")
-    .update({ assigned_to: assignee || null })
-    .eq("id", featureId);
-  revalidatePath("/", "layout");
+  const assignee = z.union([z.literal(""), z.uuid()]).safeParse(formData.get("assigned_to"));
+  if (!assignee.success) return { error: "Membre inconnu." };
+  return updateOneFeature(featureId, { assigned_to: assignee.data || null });
 }
 
 // Place la feature dans un sprint, ou la renvoie au backlog quand sprint_id est vide.
-export async function updateFeatureSprint(featureId: number, formData: FormData) {
-  const sprintId = z.union([z.literal(""), z.coerce.number().int().positive()]).parse(
-    formData.get("sprint_id"),
-  );
-  const supabase = await createClient();
-  await supabase
-    .from("features")
-    .update({ sprint_id: sprintId === "" ? null : sprintId })
-    .eq("id", featureId);
-  revalidatePath("/", "layout");
+export async function updateFeatureSprint(
+  featureId: number,
+  _previous: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const sprintId = z
+    .union([z.literal(""), z.coerce.number().int().positive()])
+    .safeParse(formData.get("sprint_id"));
+  if (!sprintId.success) return { error: "Sprint inconnu." };
+  return updateOneFeature(featureId, { sprint_id: sprintId.data === "" ? null : sprintId.data });
 }
 
 // Traduit « colonne d'arrivée » en changement à écrire dans la table features.
@@ -114,13 +141,7 @@ function toColumnChange(group: KanbanGroup, value: string) {
 export async function moveFeature(featureId: number, group: KanbanGroup, value: string): Promise<ActionResult> {
   const change = toColumnChange(group, value);
   if (!change) return { error: "Cette colonne est inconnue." };
-
-  const supabase = await createClient();
-  const { error } = await supabase.from("features").update(change).eq("id", featureId);
-  if (error) return { error: "Le déplacement n'a pas pu être enregistré." };
-
-  revalidatePath("/", "layout");
-  return { error: null };
+  return updateOneFeature(featureId, change);
 }
 
 export async function addComment(featureId: number, values: CommentValues): Promise<ActionResult> {
@@ -134,13 +155,27 @@ export async function addComment(featureId: number, values: CommentValues): Prom
   } = await supabase.auth.getUser();
   if (!user) return { error: "Tu dois être connecté pour commenter." };
 
-  const { error } = await supabase.from("comments").insert({
-    content: parsed.data.content,
-    feature_id: featureId,
-    author_id: user.id,
-  });
-  if (error) return { error: "Le commentaire n'a pas pu être envoyé." };
+  const result = await supabase
+    .from("comments")
+    .insert({ content: parsed.data.content, feature_id: featureId, author_id: user.id })
+    .select("id");
+  const checked = checkWrite(result, "Le commentaire a été refusé par la base.");
+  if (!checked.error) revalidatePath("/", "layout");
+  return checked;
+}
 
-  revalidatePath("/", "layout");
-  return { error: null };
+// Modifie le texte d'un commentaire (la RLS n'autorise que son auteur).
+export async function updateComment(commentId: number, values: CommentValues): Promise<ActionResult> {
+  const parsed = commentSchema.safeParse(values);
+  if (!parsed.success) return { error: "Le commentaire est vide." };
+
+  const supabase = await createClient();
+  const result = await supabase
+    .from("comments")
+    .update({ content: parsed.data.content })
+    .eq("id", commentId)
+    .select("id");
+  const checked = checkWrite(result, "Modification refusée : seul l'auteur peut modifier ce commentaire.");
+  if (!checked.error) revalidatePath("/", "layout");
+  return checked;
 }

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 // Lectures réutilisées par plusieurs pages (toujours côté serveur).
@@ -7,8 +8,10 @@ import { createClient } from "@/lib/supabase/server";
 export const FEATURE_WITH_RELATIONS =
   "*, module:modules(id, name, color), assignee:profiles(id, firstname, lastname, email, avatar_url)";
 
-// Profil du membre connecté (pour sa photo dans le menu).
-export async function getCurrentProfile() {
+// Profil du membre connecté, lu côté serveur : sa photo pour le menu
+// et son rôle (profiles.role) pour savoir quels boutons afficher.
+// cache() : plusieurs composants peuvent l'appeler, la lecture n'a lieu qu'une fois par page.
+export const getCurrentProfile = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,12 +20,12 @@ export async function getCurrentProfile() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, firstname, lastname, email, avatar_url")
+    .select("id, firstname, lastname, email, avatar_url, role")
     .eq("id", user.id)
     .single();
 
   return profile;
-}
+});
 
 // Listes nécessaires aux formulaires de feature (modules, sprints, membres).
 export async function getFormOptions() {

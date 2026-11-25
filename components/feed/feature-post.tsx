@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowRightIcon, MessageCircleIcon } from "lucide-react";
 import { formatDateTime, fullName } from "@/lib/format";
+import { canEditComment } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { ModuleDot, PriorityBadge, StatusBadge } from "@/components/badges";
+import { CommentBody } from "@/components/comment-body";
 import { CommentForm } from "@/components/comment-form";
 import type { CardFeature } from "@/components/feature-card";
 import { NobodyAvatar, PersonAvatar } from "@/components/person-avatar";
@@ -11,12 +13,18 @@ type Person = NonNullable<CardFeature["assignee"]>;
 
 export type PostFeature = CardFeature & {
   created_at: string;
-  comments: { id: number; content: string; created_at: string; author: Person | null }[];
+  comments: { id: number; content: string; created_at: string; author_id: string; author: Person | null }[];
 };
 
 // Un « post » du Fil : une feature présentée comme une publication,
 // avec ses deux derniers commentaires et un champ pour commenter.
-export function FeaturePost({ feature, currentUser }: { feature: PostFeature; currentUser: Person | null }) {
+export function FeaturePost({
+  feature,
+  currentUser,
+}: {
+  feature: PostFeature;
+  currentUser: (Person & { id: string; role: string }) | null;
+}) {
   // Du plus ancien au plus récent ; à date égale, l'ordre d'ajout (id) départage.
   const comments = [...feature.comments].sort(
     (a, b) => a.created_at.localeCompare(b.created_at) || a.id - b.id,
@@ -114,7 +122,13 @@ export function FeaturePost({ feature, currentUser }: { feature: PostFeature; cu
                       {formatDateTime(comment.created_at)}
                     </time>
                   </p>
-                  <p className="line-clamp-3 whitespace-pre-line">{comment.content}</p>
+                  {/* « Modifier » n'apparaît que pour l'auteur (même règle que la RLS) */}
+                  <CommentBody
+                    commentId={comment.id}
+                    content={comment.content}
+                    editable={canEditComment(currentUser, comment)}
+                    clamp
+                  />
                 </div>
               </li>
             ))}
