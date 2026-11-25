@@ -28,9 +28,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <NavLinks />
 
           <div className="ml-auto flex shrink-0 items-center gap-3">
-            {/* Un clic sur ma photo ouvre la page « Mon profil » */}
+            {/* Un clic sur ma photo ouvre « Mon profil », directement au champ photo */}
             <Link
-              href="/profil"
+              href="/profil#photo"
               aria-label="Mon profil"
               className="flex items-center gap-3 rounded-full pr-1 outline-none transition hover:text-accent focus-visible:shadow-glow"
             >
