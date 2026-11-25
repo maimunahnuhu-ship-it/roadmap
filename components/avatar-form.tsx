@@ -3,7 +3,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { CameraIcon, CheckIcon, UploadIcon } from "lucide-react";
+import { CameraIcon, UploadIcon } from "lucide-react";
+import { toast } from "sonner";
 import { uploadAvatar } from "@/lib/actions/profile";
 import { checkAvatarFile } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ export function AvatarForm({ children }: { children: React.ReactNode }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // Libère l'adresse temporaire de l'aperçu quand elle ne sert plus.
@@ -29,7 +29,6 @@ export function AvatarForm({ children }: { children: React.ReactNode }) {
   }, []);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setSaved(false);
     const file = event.target.files?.[0];
     if (!file) {
       setPreview(null);
@@ -50,7 +49,7 @@ export function AvatarForm({ children }: { children: React.ReactNode }) {
       }
       setError(null);
       setPreview(null);
-      setSaved(true);
+      toast.success("Photo enregistrée !");
       if (inputRef.current) inputRef.current.value = "";
     });
   }
@@ -97,12 +96,6 @@ export function AvatarForm({ children }: { children: React.ReactNode }) {
           JPG, PNG ou WebP, 2 Mo maximum.
         </p>
         <FieldError message={error ?? undefined} />
-        {saved && (
-          <p role="status" className="inline-flex items-center gap-1.5 text-small text-status-done">
-            <CheckIcon aria-hidden="true" className="size-4" />
-            Photo enregistrée
-          </p>
-        )}
       </div>
     </form>
   );

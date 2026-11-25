@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { FilterIcon, PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_WITH_RELATIONS, getCurrentProfile, getFormOptions } from "@/lib/queries";
 import {
@@ -28,6 +28,7 @@ import { FeatureFormDialog } from "@/components/feature-form-dialog";
 import { FeatureGallery } from "@/components/feature-gallery";
 import { FeatureList } from "@/components/feature-list";
 import { FeaturePost } from "@/components/feed/feature-post";
+import { SprintBanner } from "@/components/sprint-banner";
 import { SprintStories } from "@/components/feed/sprint-stories";
 import { KanbanBoard } from "@/components/kanban-board";
 import { ViewSwitcher } from "@/components/view-switcher";
@@ -104,10 +105,17 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
 
   // La base stocke priorité et impact en texte : un tri alphabétique serait faux,
   // on trie donc ici avec un rang (1 = le plus important). Le Fil reste chronologique.
+  // Tri par module : ordre alphabétique du nom. Tri par sprint : du plus ancien
+  // au plus récent, les features sans sprint (backlog) à la fin.
+  // sort() garde l'ordre « plus récentes » à égalité.
   if (view !== "fil" && filters.sort === "priority") {
     features.sort((a, b) => PRIORITY_RANK[toPriority(a.priority)] - PRIORITY_RANK[toPriority(b.priority)]);
   } else if (view !== "fil" && filters.sort === "impact") {
     features.sort((a, b) => IMPACT_RANK[toImpact(a.impact)] - IMPACT_RANK[toImpact(b.impact)]);
+  } else if (view !== "fil" && filters.sort === "module") {
+    features.sort((a, b) => (a.module?.name ?? "").localeCompare(b.module?.name ?? "", "fr"));
+  } else if (view !== "fil" && filters.sort === "sprint") {
+    features.sort((a, b) => (a.sprint_id ?? Infinity) - (b.sprint_id ?? Infinity));
   }
 
   const hasFilters = Boolean(
@@ -137,96 +145,118 @@ export default async function BacklogPage({ searchParams }: PageProps<"/">) {
         )}
       </div>
 
-      <div className="mb-6">
-        <ViewSwitcher current={view} hrefFor={hrefForView} />
-      </div>
+      {/* Le sprint en cours : compte à rebours, avancement, équipe */}
+      <SprintBanner />
 
-      {/* Recherche, filtres et tri : formulaire GET, envoyé à chaque changement */}
-      <form action="/" className="mb-8 flex flex-wrap items-center gap-3" role="search">
+      {/* Barre d'outils : en haut l'affichage (vue, regroupement, tri), en bas les filtres.
+          C'est un seul formulaire GET, envoyé à chaque changement. */}
+      <form
+        action="/"
+        role="search"
+        className="mb-8 flex flex-col gap-4 rounded-xl bg-surface/70 p-4 shadow-clay-sm sm:p-5"
+      >
         {/* La vue choisie est renvoyée avec les filtres pour ne pas la perdre */}
         {view !== "liste" && <input type="hidden" name="vue" value={view} />}
 
-        <div className="relative w-full sm:w-auto sm:max-w-80 sm:flex-1">
-          <SearchIcon aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-ink-muted" />
-          <label htmlFor="q" className="sr-only">
-            Rechercher par titre
-          </label>
-          <Input id="q" name="q" type="search" defaultValue={filters.q} placeholder="Rechercher une feature…" className="h-10 rounded-full pl-10" />
-          <button type="submit" className="sr-only">
-            Rechercher
-          </button>
+        {/* Ligne 1 : comment afficher */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <ViewSwitcher current={view} hrefFor={hrefForView} />
+
+          <div className="flex flex-wrap items-center gap-3">
+            {view === "kanban" && (
+              <AutoSubmitSelect variant="chip" name="groupe" defaultValue={group} active aria-label="Grouper par">
+                {KANBAN_GROUPS.map((value) => (
+                  <option key={value} value={value}>
+                    Grouper par : {KANBAN_GROUP_LABELS[value].toLowerCase()}
+                  </option>
+                ))}
+              </AutoSubmitSelect>
+            )}
+
+            {/* Le Fil est toujours chronologique : pas de tri */}
+            {view !== "fil" && (
+              <AutoSubmitSelect variant="chip" name="sort" defaultValue={filters.sort} active={filters.sort !== "recent"} aria-label="Trier">
+                <option value="recent">Tri : plus récentes</option>
+                <option value="priority">Tri : priorité</option>
+                <option value="impact">Tri : impact</option>
+                <option value="module">Tri : module</option>
+                <option value="sprint">Tri : sprint</option>
+              </AutoSubmitSelect>
+            )}
+          </div>
         </div>
 
-        <AutoSubmitSelect variant="chip" name="module" defaultValue={filters.module} active={Boolean(filters.module)} aria-label="Filtrer par module">
-          <option value="">Module</option>
-          {options.modules.map((module) => (
-            <option key={module.id} value={String(module.id)}>
-              {module.name}
-            </option>
-          ))}
-        </AutoSubmitSelect>
+        <hr className="border-border" />
 
-        <AutoSubmitSelect variant="chip" name="status" defaultValue={filters.status} active={Boolean(filters.status)} aria-label="Filtrer par statut">
-          <option value="">Statut</option>
-          {FEATURE_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {FEATURE_STATUS_LABELS[status]}
-            </option>
-          ))}
-        </AutoSubmitSelect>
+        {/* Ligne 2 : quoi afficher (recherche et filtres) */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-full lg:w-80">
+            <SearchIcon aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-ink-muted" />
+            <label htmlFor="q" className="sr-only">
+              Rechercher par titre
+            </label>
+            <Input id="q" name="q" type="search" defaultValue={filters.q} placeholder="Rechercher une feature…" className="h-10 rounded-full pl-10" />
+            <button type="submit" className="sr-only">
+              Rechercher
+            </button>
+          </div>
 
-        <AutoSubmitSelect variant="chip" name="priority" defaultValue={filters.priority} active={Boolean(filters.priority)} aria-label="Filtrer par priorité">
-          <option value="">Priorité</option>
-          {PRIORITIES.map((priority) => (
-            <option key={priority} value={priority}>
-              {PRIORITY_LABELS[priority]}
-            </option>
-          ))}
-        </AutoSubmitSelect>
+          <span className="inline-flex items-center gap-1.5 text-label uppercase text-ink-soft max-sm:hidden">
+            <FilterIcon aria-hidden="true" className="size-4" />
+            Filtres
+          </span>
 
-        <AutoSubmitSelect variant="chip" name="sprint" defaultValue={filters.sprint} active={Boolean(filters.sprint)} aria-label="Filtrer par sprint">
-          <option value="">Sprint</option>
-          <option value="none">Sans sprint</option>
-          {options.sprints.map((sprint) => (
-            <option key={sprint.id} value={String(sprint.id)}>
-              {sprintName(sprint.id)}
-            </option>
-          ))}
-        </AutoSubmitSelect>
+          <AutoSubmitSelect variant="chip" name="module" defaultValue={filters.module} active={Boolean(filters.module)} aria-label="Filtrer par module">
+            <option value="">Module</option>
+            {options.modules.map((module) => (
+              <option key={module.id} value={String(module.id)}>
+                {module.name}
+              </option>
+            ))}
+          </AutoSubmitSelect>
 
-        <AutoSubmitSelect variant="chip" name="assignee" defaultValue={filters.assignee} active={Boolean(filters.assignee)} aria-label="Filtrer par personne assignée">
-          <option value="">Assignée à</option>
-          {options.profiles.map((profile) => (
-            <option key={profile.id} value={profile.id}>
-              {fullName(profile)}
-            </option>
-          ))}
-          <option value="none">Personne</option>
-        </AutoSubmitSelect>
+          <AutoSubmitSelect variant="chip" name="status" defaultValue={filters.status} active={Boolean(filters.status)} aria-label="Filtrer par statut">
+            <option value="">Statut</option>
+            {FEATURE_STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {FEATURE_STATUS_LABELS[status]}
+              </option>
+            ))}
+          </AutoSubmitSelect>
 
-        <div className="flex flex-wrap items-center gap-3 sm:ml-auto">
-          {view === "kanban" && (
-            <AutoSubmitSelect variant="chip" name="groupe" defaultValue={group} active aria-label="Grouper par">
-              {KANBAN_GROUPS.map((value) => (
-                <option key={value} value={value}>
-                  Grouper par : {KANBAN_GROUP_LABELS[value].toLowerCase()}
-                </option>
-              ))}
-            </AutoSubmitSelect>
-          )}
+          <AutoSubmitSelect variant="chip" name="priority" defaultValue={filters.priority} active={Boolean(filters.priority)} aria-label="Filtrer par priorité">
+            <option value="">Priorité</option>
+            {PRIORITIES.map((priority) => (
+              <option key={priority} value={priority}>
+                {PRIORITY_LABELS[priority]}
+              </option>
+            ))}
+          </AutoSubmitSelect>
 
-          {/* Le Fil est toujours chronologique : pas de tri */}
-          {view !== "fil" && (
-            <AutoSubmitSelect variant="chip" name="sort" defaultValue={filters.sort} active={filters.sort !== "recent"} aria-label="Trier">
-              <option value="recent">Tri : plus récentes</option>
-              <option value="priority">Tri : priorité</option>
-              <option value="impact">Tri : impact</option>
-            </AutoSubmitSelect>
-          )}
+          <AutoSubmitSelect variant="chip" name="sprint" defaultValue={filters.sprint} active={Boolean(filters.sprint)} aria-label="Filtrer par sprint">
+            <option value="">Sprint</option>
+            <option value="none">Sans sprint</option>
+            {options.sprints.map((sprint) => (
+              <option key={sprint.id} value={String(sprint.id)}>
+                {sprintName(sprint.id)}
+              </option>
+            ))}
+          </AutoSubmitSelect>
+
+          <AutoSubmitSelect variant="chip" name="assignee" defaultValue={filters.assignee} active={Boolean(filters.assignee)} aria-label="Filtrer par personne assignée">
+            <option value="">Assignée à</option>
+            {options.profiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>
+                {fullName(profile)}
+              </option>
+            ))}
+            <option value="none">Personne</option>
+          </AutoSubmitSelect>
 
           {hasFilters && (
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm" className="ml-auto">
               <Link href={backlogHref({ module: "", status: "", priority: "", sprint: "", assignee: "", q: "" })}>
+                <XIcon aria-hidden="true" />
                 Effacer les filtres
               </Link>
             </Button>

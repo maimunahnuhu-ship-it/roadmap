@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PencilIcon } from "lucide-react";
 import { updateComment } from "@/lib/actions/features";
@@ -43,6 +44,7 @@ export function CommentBody({ commentId, content, editable, clamp = false }: Com
       return;
     }
     setEditing(false);
+    toast.success("Commentaire modifié");
   }
 
   if (!editing) {

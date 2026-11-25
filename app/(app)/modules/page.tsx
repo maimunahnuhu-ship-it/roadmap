@@ -32,7 +32,7 @@ export default async function ModulesPage() {
         />
       </div>
 
-      <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {(modules ?? []).map((module) => {
           const count = module.features[0]?.count ?? 0;
           return (

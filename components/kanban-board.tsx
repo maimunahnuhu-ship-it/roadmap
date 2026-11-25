@@ -2,7 +2,7 @@
 // du navigateur et d'un état local pour déplacer la carte tout de suite.
 "use client";
 
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -21,7 +21,9 @@ import {
   type KeyboardCoordinateGetter,
   type UniqueIdentifier,
 } from "@dnd-kit/core";
-import { Undo2Icon, XIcon } from "lucide-react";
+import { Undo2Icon } from "lucide-react";
+import { toast } from "sonner";
+import { celebrate } from "@/lib/celebrate";
 import { moveFeature, updateFeatureSprint } from "@/lib/actions/features";
 import { canEditFeature } from "@/lib/permissions";
 import { columnOf, type KanbanColumn, type KanbanGroup } from "@/lib/views";
@@ -72,7 +74,8 @@ const detectColumn: CollisionDetection = (args) => {
 
 export function KanbanBoard({ features, viewer, columns, group, removableFromSprint = false }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  // Dernière carte lâchée : elle rebondit en arrivant dans sa colonne.
+  const [droppedId, setDroppedId] = useState<number | null>(null);
   const [, startTransition] = useTransition();
 
   // Chaque feature avec sa colonne. Pendant l'enregistrement, useOptimistic affiche
@@ -92,13 +95,6 @@ export function KanbanBoard({ features, viewer, columns, group, removableFromSpr
       keyboardCodes: { start: ["Space"], cancel: ["Escape"], end: ["Space", "Enter"] },
     }),
   );
-
-  // Le message d'erreur disparaît tout seul après quelques secondes.
-  useEffect(() => {
-    if (!message) return;
-    const timer = setTimeout(() => setMessage(null), 6000);
-    return () => clearTimeout(timer);
-  }, [message]);
 
   const titleOf = (id: UniqueIdentifier) => placed.find((item) => item.feature.id === id)?.feature.title ?? "";
   const labelOf = (id: UniqueIdentifier) => columns.find((column) => column.id === id)?.label ?? "";
@@ -122,7 +118,7 @@ export function KanbanBoard({ features, viewer, columns, group, removableFromSpr
     const targetColumn = String(over.id);
     if (!item || item.column === targetColumn) return;
 
-    setMessage(null);
+    setDroppedId(item.feature.id);
     startTransition(async () => {
       placeOptimistic({ id: item.feature.id, column: targetColumn });
       let error: string | null;
@@ -131,7 +127,13 @@ export function KanbanBoard({ features, viewer, columns, group, removableFromSpr
       } catch {
         error = "Le serveur ne répond pas.";
       }
-      if (error) setMessage(`« ${item.feature.title} » est revenue à sa place. ${error}`);
+      // Refus : la carte revient seule (useOptimistic) et une notification explique pourquoi.
+      if (error) {
+        toast.error(`« ${item.feature.title} » est revenue à sa place.`, { description: error });
+        return;
+      }
+      // Une feature qui arrive dans « Terminé » : confettis !
+      if (group === "statut" && targetColumn === "done") celebrate();
     });
   }
 
@@ -168,6 +170,7 @@ export function KanbanBoard({ features, viewer, columns, group, removableFromSpr
                     removableFromSprint={removableFromSprint}
                     // Même règle que la RLS : un admin, ou la personne assignée.
                     canMove={canEditFeature(viewer, feature)}
+                    justDropped={feature.id === droppedId}
                   />
                 ))}
               </Column>
@@ -185,17 +188,6 @@ export function KanbanBoard({ features, viewer, columns, group, removableFromSpr
         </DragOverlay>
       </DndContext>
 
-      {message && (
-        <div
-          role="alert"
-          className="fixed inset-x-4 bottom-8 z-40 mx-auto flex w-fit items-center gap-3 rounded-lg bg-danger-soft py-3 pr-3 pl-5 font-bold text-danger shadow-clay"
-        >
-          {message}
-          <Button variant="ghost" size="icon" aria-label="Fermer le message" onClick={() => setMessage(null)}>
-            <XIcon aria-hidden="true" />
-          </Button>
-        </div>
-      )}
     </>
   );
 }
@@ -219,7 +211,9 @@ function Column({
       ref={setNodeRef}
       aria-label={`Colonne ${column.label}`}
       className={cn(
-        "flex w-72 shrink-0 flex-col rounded-xl bg-surface/55 p-4 shadow-clay-sm transition duration-150",
+        // w-72 grow : chaque colonne fait au moins 288 px et s'étire pour remplir
+        // toute la largeur ; s'il y en a trop, la rangée défile horizontalement.
+        "flex w-72 shrink-0 grow flex-col rounded-xl bg-surface/55 p-4 shadow-clay-sm transition duration-150",
         isOver && "bg-surface-tint ring-2 ring-accent",
       )}
     >
@@ -257,11 +251,13 @@ function KanbanCard({
   showStatus,
   removableFromSprint,
   canMove,
+  justDropped,
 }: {
   feature: CardFeature;
   showStatus: boolean;
   removableFromSprint: boolean;
   canMove: boolean;
+  justDropped: boolean;
 }) {
   const router = useRouter();
   // disabled : la carte reste cliquable mais ne peut plus être déplacée.
@@ -273,7 +269,8 @@ function KanbanCard({
   const openDetail = () => router.push(`/features/${feature.id}`);
 
   return (
-    <li className="relative">
+    // La carte lâchée change de colonne, donc s'affiche à nouveau : l'animation de rebond se joue.
+    <li className={cn("relative", justDropped && "animate-drop-bounce")}>
       <div
         ref={setNodeRef}
         {...attributes}

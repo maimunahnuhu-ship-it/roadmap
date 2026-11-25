@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/login-form";
+import { Logo } from "@/components/logo";
 
 export const metadata: Metadata = { title: "Connexion · Roadmap" };
 
@@ -15,7 +16,7 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-md rounded-xl bg-surface px-8 py-10 shadow-clay">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <span aria-hidden="true" className="bille size-14 bg-aurora" />
+          <Logo className="size-18" />
           <div>
             <h1 className="font-title text-display">Roadmap</h1>
             <p className="text-body-lg text-ink-soft">Capturer, ranger, planifier. En équipe.</p>

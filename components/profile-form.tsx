@@ -1,11 +1,11 @@
 // Composant client : react-hook-form valide le prénom et le nom
-// et affiche la confirmation ou le refus de la base.
+// et affiche le refus de la base, ou une notification de confirmation.
 "use client";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckIcon } from "lucide-react";
+import { toast } from "sonner";
 import { updateMyProfile } from "@/lib/actions/profile";
 import { profileSchema, type ProfileValues } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import { FieldError } from "@/components/field-error";
 
 export function ProfileForm({ defaultValues }: { defaultValues: ProfileValues }) {
   const [serverError, setServerError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   const form = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
     defaultValues,
@@ -24,13 +23,12 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileValues })
 
   async function onSubmit(values: ProfileValues) {
     setServerError(null);
-    setSaved(false);
     const result = await updateMyProfile(values);
     if (result.error) {
       setServerError(result.error);
       return;
     }
-    setSaved(true);
+    toast.success("Profil enregistré !");
   }
 
   return (
@@ -55,12 +53,6 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileValues })
       <FieldError message={serverError ?? undefined} />
 
       <div className="flex items-center justify-end gap-4">
-        {saved && (
-          <p role="status" className="inline-flex items-center gap-1.5 text-small text-status-done">
-            <CheckIcon aria-hidden="true" className="size-4" />
-            Profil enregistré
-          </p>
-        )}
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Enregistrement…" : "Enregistrer"}
         </Button>

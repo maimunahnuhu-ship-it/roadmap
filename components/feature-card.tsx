@@ -24,7 +24,7 @@ export type CardFeature = {
 
 // Classes de la carte, partagées par la Galerie (un lien) et le Kanban (une carte déplaçable).
 export const featureCardClasses =
-  "flex flex-col gap-3 rounded-lg bg-surface p-4 text-left shadow-clay-sm transition duration-150 ease-bounce outline-none hover:-translate-y-0.5 hover:shadow-clay-hover focus-visible:shadow-glow";
+  "flex flex-col gap-3 rounded-lg bg-surface p-4 text-left shadow-clay-sm transition duration-150 ease-bounce outline-none hover:-translate-y-1 hover:-rotate-1 hover:shadow-clay-hover focus-visible:shadow-glow";
 
 type FeatureCardContentProps = {
   feature: CardFeature;

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logos · Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Styles propres à cette page de comparaison (prototype uniquement) */
+    .logos-page { max-width: 1200px; margin: 0 auto; padding: var(--space-12) var(--space-8) var(--space-16); }
+    .logos-page h1 { font-family: var(--font-title); font-size: 32px; line-height: 40px; font-weight: 600; }
+    .logos-page .intro { color: var(--ink-soft); margin: var(--space-2) 0 var(--space-10); max-width: 640px; }
+    .logo-grid { display: grid; gap: var(--space-8); grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .logo-card { display: flex; flex-direction: column; gap: var(--space-6); }
+    .logo-card .letter { font-family: var(--font-data); font-weight: 600; color: var(--accent); font-size: 14px; }
+    .logo-card h2 { font-family: var(--font-title); font-size: 24px; line-height: 32px; font-weight: 600; }
+    .logo-card p { color: var(--ink-soft); }
+    .stage { display: grid; place-items: center; min-height: 200px; border-radius: var(--radius-lg); background: var(--bg); box-shadow: var(--shadow-sunken); }
+    .stage.dark { background: var(--ink); }
+    .lockup { display: flex; align-items: center; gap: 12px; font-family: var(--font-title); font-weight: 600; font-size: 26px; color: var(--ink); }
+    .stage.dark .lockup { color: var(--surface); }
+    .sizes { display: flex; align-items: center; gap: var(--space-6); }
+    .sizes span { font-family: var(--font-data); font-size: 12px; color: var(--ink-muted); }
+    .sizes .favicon { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
+    .rows { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    ul.pros { padding-left: 18px; color: var(--ink-soft); display: grid; gap: var(--space-1); }
+  </style>
+</head>
+<body>
+  <main class="logos-page">
+    <h1>Trois logos pour Roadmap</h1>
+    <p class="intro">
+      Trois pistes originales, construites avec les couleurs et les formes arrondies du design system :
+      chacune raconte un chemin qui avance par étapes. Chaque logo est montré en grand, avec le nom,
+      sur fond sombre et en tout petit (taille d'icône d'onglet). Rien n'est encore intégré à l'application.
+    </p>
+
+    <!-- Les dégradés sont déclarés une fois et réutilisés par les trois logos -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="aurora" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#8B7BFF"/>
+          <stop offset="0.55" stop-color="#5FC8FF"/>
+          <stop offset="1" stop-color="#6EE7C5"/>
+        </linearGradient>
+        <radialGradient id="shine" cx="0.32" cy="0.3" r="0.6">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.85"/>
+          <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>
+        </radialGradient>
+        <!-- A : le chemin à billes -->
+        <symbol id="logo-a" viewBox="0 0 64 64">
+          <rect x="2" y="2" width="60" height="60" rx="20" fill="#FFFFFF"/>
+          <path d="M14 46 C 14 30, 50 34, 50 18" fill="none" stroke="#E9E5FF" stroke-width="9" stroke-linecap="round"/>
+          <path d="M14 46 C 14 30, 50 34, 50 18" fill="none" stroke="url(#aurora)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 9"/>
+          <circle cx="14" cy="46" r="7" fill="#B9A8FF"/><circle cx="14" cy="46" r="7" fill="url(#shine)"/>
+          <circle cx="32" cy="32" r="6" fill="#9CD3FF"/><circle cx="32" cy="32" r="6" fill="url(#shine)"/>
+          <circle cx="50" cy="18" r="8" fill="#8FE3C0"/><circle cx="50" cy="18" r="8" fill="url(#shine)"/>
+          <path d="M46.5 18.2 l2.4 2.4 l4.6 -4.8" fill="none" stroke="#187048" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </symbol>
+        <!-- B : l'escalier bonbon -->
+        <symbol id="logo-b" viewBox="0 0 64 64">
+          <rect x="2" y="2" width="60" height="60" rx="20" fill="#6C5CF5"/>
+          <rect x="11" y="38" width="13" height="15" rx="6.5" fill="#FFA8C5"/>
+          <rect x="25.5" y="28" width="13" height="25" rx="6.5" fill="#FFE07A"/>
+          <rect x="40" y="18" width="13" height="35" rx="6.5" fill="#8FE3C0"/>
+          <rect x="11" y="38" width="13" height="15" rx="6.5" fill="url(#shine)"/>
+          <rect x="25.5" y="28" width="13" height="25" rx="6.5" fill="url(#shine)"/>
+          <rect x="40" y="18" width="13" height="35" rx="6.5" fill="url(#shine)"/>
+          <path d="M17.5 30 Q 24 20 32 21" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 4.5"/>
+          <circle cx="46.5" cy="11" r="5" fill="#FFFFFF"/>
+          <circle cx="46.5" cy="11" r="5" fill="url(#aurora)" opacity="0.55"/>
+        </symbol>
+        <!-- C : le R-chemin -->
+        <symbol id="logo-c" viewBox="0 0 64 64">
+          <rect x="2" y="2" width="60" height="60" rx="20" fill="url(#aurora)"/>
+          <path d="M22 50 V 16 H 34 a 10 10 0 0 1 0 20 H 26" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M31 38 L 42 48" fill="none" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0.1 7"/>
+          <circle cx="47" cy="50" r="5.5" fill="#FFE07A"/>
+          <circle cx="47" cy="50" r="5.5" fill="url(#shine)"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="logo-grid">
+      <!-- Logo A -->
+      <article class="card logo-card">
+        <span class="letter">A</span>
+        <h2>Le chemin à billes</h2>
+        <div class="stage">
+          <svg width="128" height="128" role="img" aria-label="Logo A : un chemin courbe qui relie trois billes"><use href="#logo-a"/></svg>
+        </div>
+        <div class="rows">
+          <div class="stage" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-a"/></svg>Roadmap</span></div>
+          <div class="stage dark" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-a"/></svg>Roadmap</span></div>
+        </div>
+        <div class="sizes">
+          <div class="favicon"><svg width="32" height="32" aria-hidden="true"><use href="#logo-a"/></svg><span>32 px</span></div>
+          <div class="favicon"><svg width="16" height="16" aria-hidden="true"><use href="#logo-a"/></svg><span>16 px</span></div>
+        </div>
+        <p>Un chemin en pointillés aurora relie trois billes de pâte à modeler, du lilas (l'idée) au vert menthe (terminé ✓).</p>
+        <ul class="pros">
+          <li>Raconte le parcours idée → sprint → livré</li>
+          <li>Reprend les « billes » des modules de l'app</li>
+          <li>Un peu fin en 16 px : le chemin devient discret</li>
+        </ul>
+      </article>
+
+      <!-- Logo B -->
+      <article class="card logo-card">
+        <span class="letter">B</span>
+        <h2>L'escalier bonbon</h2>
+        <div class="stage">
+          <svg width="128" height="128" role="img" aria-label="Logo B : trois marches arrondies qui montent, avec une bille qui saute"><use href="#logo-b"/></svg>
+        </div>
+        <div class="rows">
+          <div class="stage" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-b"/></svg>Roadmap</span></div>
+          <div class="stage dark" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-b"/></svg>Roadmap</span></div>
+        </div>
+        <div class="sizes">
+          <div class="favicon"><svg width="32" height="32" aria-hidden="true"><use href="#logo-b"/></svg><span>32 px</span></div>
+          <div class="favicon"><svg width="16" height="16" aria-hidden="true"><use href="#logo-b"/></svg><span>16 px</span></div>
+        </div>
+        <p>Trois marches arrondies rose, beurre et menthe, comme une barre de progression qui grimpe, et une bille qui saute vers la dernière.</p>
+        <ul class="pros">
+          <li>Le plus « bonbon » et le plus joyeux</li>
+          <li>Très lisible en petit (fond violet plein)</li>
+          <li>Évoque la progression plus que le chemin</li>
+        </ul>
+      </article>
+
+      <!-- Logo C -->
+      <article class="card logo-card">
+        <span class="letter">C</span>
+        <h2>Le R-chemin</h2>
+        <div class="stage">
+          <svg width="128" height="128" role="img" aria-label="Logo C : la lettre R dont la jambe devient un chemin en pointillés jusqu'à une étape"><use href="#logo-c"/></svg>
+        </div>
+        <div class="rows">
+          <div class="stage" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-c"/></svg>Roadmap</span></div>
+          <div class="stage dark" style="min-height:96px"><span class="lockup"><svg width="40" height="40" aria-hidden="true"><use href="#logo-c"/></svg>Roadmap</span></div>
+        </div>
+        <div class="sizes">
+          <div class="favicon"><svg width="32" height="32" aria-hidden="true"><use href="#logo-c"/></svg><span>32 px</span></div>
+          <div class="favicon"><svg width="16" height="16" aria-hidden="true"><use href="#logo-c"/></svg><span>16 px</span></div>
+        </div>
+        <p>Un R arrondi dont la jambe se transforme en pointillés qui mènent à une bille dorée : la prochaine étape.</p>
+        <ul class="pros">
+          <li>Initiale reconnaissable, effet « monogramme »</li>
+          <li>Fond aurora : la signature futuriste du design system</li>
+          <li>L'aurora en grand aplat sort de la règle « aurora rare »</li>
+        </ul>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

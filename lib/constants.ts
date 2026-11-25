@@ -21,6 +21,15 @@ export const FEATURE_STATUS_CLASSES: Record<FeatureStatus, string> = {
   cancelled: "bg-status-cancelled-soft text-status-cancelled",
 };
 
+// Variante « bloc plein » (cellule de statut de la vue Liste) : fond de couleur, texte blanc.
+export const FEATURE_STATUS_SOLID_CLASSES: Record<FeatureStatus, string> = {
+  backlog: "bg-status-backlog text-on-accent",
+  todo: "bg-status-todo text-on-accent",
+  in_progress: "bg-status-in-progress text-on-accent",
+  done: "bg-status-done text-on-accent",
+  cancelled: "bg-status-cancelled text-on-accent",
+};
+
 export const PRIORITIES = ["critical", "high", "medium", "low", "nice_to_have"] as const;
 export type Priority = (typeof PRIORITIES)[number];
 

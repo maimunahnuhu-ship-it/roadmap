@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IMPACT_LABELS, toImpact } from "@/lib/constants";
 import { sprintName } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { EffortChip, ModuleDot, PriorityBadge, StatusBadge } from "@/components/badges";
+import { EffortChip, ModuleDot, PriorityBadge, StatusBlock } from "@/components/badges";
 import type { CardFeature } from "@/components/feature-card";
 import { NobodyAvatar, PersonAvatar } from "@/components/person-avatar";
 
@@ -17,7 +17,7 @@ export function FeatureList({ features }: { features: ListFeature[] }) {
       <div aria-hidden="true" className="mb-2 flex items-center gap-3 px-4 text-label uppercase text-ink-soft max-md:hidden">
         <span className="min-w-0 flex-1">Feature</span>
         <span className="w-36 max-lg:hidden">Module</span>
-        <span className="w-26">Statut</span>
+        <span className="w-28 text-center">Statut</span>
         <span className="w-26">Priorité</span>
         <span className="w-13 max-lg:hidden">Effort</span>
         <span className="w-16 max-lg:hidden">Impact</span>
@@ -30,7 +30,7 @@ export function FeatureList({ features }: { features: ListFeature[] }) {
           <li key={feature.id}>
             <Link
               href={`/features/${feature.id}`}
-              className="flex min-h-15 items-center gap-3 rounded-lg bg-surface px-4 py-3 shadow-clay-sm transition duration-150 ease-bounce outline-none hover:-translate-y-0.5 hover:shadow-clay-hover focus-visible:shadow-glow"
+              className="flex min-h-15 items-center gap-3 rounded-lg bg-surface px-4 py-3 shadow-clay-sm transition duration-150 ease-bounce outline-none hover:-translate-y-0.5 hover:scale-101 hover:shadow-clay-hover focus-visible:shadow-glow"
             >
               <span className="flex min-w-0 flex-1 items-center gap-3">
                 <ModuleDot color={feature.module?.color ?? "#B9A8FF"} />
@@ -44,8 +44,9 @@ export function FeatureList({ features }: { features: ListFeature[] }) {
                 </span>
               </span>
               <span className="w-36 truncate text-small text-ink-soft max-lg:hidden">{feature.module?.name}</span>
-              <span className="w-26">
-                <StatusBadge status={feature.status} />
+              {/* Statut en bloc de couleur pleine, façon tableau */}
+              <span className="w-28">
+                <StatusBlock status={feature.status} />
               </span>
               <span className="w-26 max-md:hidden">
                 <PriorityBadge priority={feature.priority} />

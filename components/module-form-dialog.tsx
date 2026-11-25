@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { saveModule } from "@/lib/actions/modules";
 import { moduleSchema, type ModuleValues } from "@/lib/schemas";
@@ -63,6 +64,7 @@ export function ModuleFormDialog({ trigger, module }: ModuleFormDialogProps) {
       return;
     }
     setOpen(false);
+    toast.success(module ? "Module modifié !" : "Module créé !");
   }
 
   return (

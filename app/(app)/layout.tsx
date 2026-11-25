@@ -4,9 +4,12 @@ import { LogOutIcon } from "lucide-react";
 import { getCurrentProfile } from "@/lib/queries";
 import { logout } from "@/lib/actions/auth";
 import { fullName } from "@/lib/format";
+import { Logo } from "@/components/logo";
 import { NavLinks } from "@/components/nav-links";
 import { PersonAvatar } from "@/components/person-avatar";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
+import { Confetti } from "@/components/confetti";
 
 // Mise en page commune à toutes les pages réservées aux membres :
 // le menu en haut, puis le contenu de la page.
@@ -19,9 +22,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-19 max-w-page items-center gap-6 overflow-x-auto px-8">
+        {/* Pleine largeur ; les marges s'agrandissent avec l'écran (téléphone → ordinateur) */}
+        <div className="flex h-19 w-full items-center gap-3 overflow-x-auto px-4 sm:gap-6 sm:px-6 lg:px-10">
           <Link href="/" className="flex shrink-0 items-center gap-3 font-title text-h3 font-semibold">
-            <span aria-hidden="true" className="bille size-7.5 bg-aurora" />
+            <Logo className="size-9 transition duration-150 ease-bounce hover:-rotate-6" />
             <span className="max-sm:sr-only">Roadmap</span>
           </Link>
 
@@ -40,16 +44,21 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <form action={logout}>
               <Button type="submit" variant="ghost" size="sm">
                 <LogOutIcon aria-hidden="true" />
-                Déconnexion
+                {/* Sur téléphone, seule l'icône reste visible (le texte reste lu par les lecteurs d'écran) */}
+                <span className="max-sm:sr-only">Déconnexion</span>
               </Button>
             </form>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-page flex-1 flex-col px-8 pt-10 pb-28">
+      <main className="flex w-full flex-1 flex-col px-4 pt-8 pb-28 sm:px-6 lg:px-10 lg:pt-10">
         {children}
       </main>
+
+      {/* Notifications animées en bas de l'écran, et pluie de confettis */}
+      <Toaster />
+      <Confetti />
     </>
   );
 }

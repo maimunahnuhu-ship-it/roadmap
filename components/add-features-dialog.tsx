@@ -4,6 +4,7 @@
 
 import { useState, useTransition } from "react";
 import { PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 import { addFeaturesToSprint } from "@/lib/actions/sprints";
 import {
   Dialog,
@@ -43,8 +44,13 @@ export function AddFeaturesDialog({
     startTransition(async () => {
       const result = await addFeaturesToSprint(sprintId, formData);
       // En cas de refus, la fenêtre reste ouverte avec le message.
-      if (result.error) setError(result.error);
-      else setOpen(false);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setOpen(false);
+      const added = formData.getAll("feature_ids").length;
+      if (added > 0) toast.success(`${added} feature${added > 1 ? "s ajoutées" : " ajoutée"} au sprint !`);
     });
   }
 

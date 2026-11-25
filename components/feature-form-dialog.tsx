@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFeature, updateFeature } from "@/lib/actions/features";
 import { featureSchema, type FeatureValues } from "@/lib/schemas";
@@ -85,6 +86,7 @@ export function FeatureFormDialog({ options, trigger, feature }: FeatureFormDial
       return;
     }
     setOpen(false);
+    toast.success(feature ? "Feature modifiée !" : "Feature créée !");
   }
 
   return (

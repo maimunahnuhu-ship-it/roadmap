@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SendIcon } from "lucide-react";
 import { addComment } from "@/lib/actions/features";
@@ -32,6 +33,7 @@ export function CommentForm({ featureId, compact = false }: { featureId: number;
       return;
     }
     form.reset();
+    toast.success("Commentaire envoyé");
   }
 
   if (compact) {

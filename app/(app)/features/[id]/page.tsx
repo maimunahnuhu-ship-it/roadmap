@@ -21,6 +21,7 @@ import type { FeatureValues } from "@/lib/schemas";
 import { ActionForm } from "@/components/action-form";
 import { AutoSubmitSelect } from "@/components/auto-submit-select";
 import { CountPill, EffortChip, ModuleDot, PriorityBadge, StatusBadge } from "@/components/badges";
+import { CelebrateWhenDone } from "@/components/confetti";
 import { CommentBody } from "@/components/comment-body";
 import { CommentForm } from "@/components/comment-form";
 import { DeleteFeatureButton } from "@/components/delete-feature-button";
@@ -77,6 +78,9 @@ export default async function FeaturePage({ params }: PageProps<"/features/[id]"
 
   return (
     <>
+      {/* Confettis quand la feature passe à « Terminé » */}
+      <CelebrateWhenDone status={currentStatus} />
+
       <Link href="/" className="mb-4 inline-flex items-center gap-1 self-start rounded-full font-bold text-ink-soft outline-none hover:text-accent focus-visible:shadow-glow">
         <ChevronLeftIcon className="size-4.5" aria-hidden="true" />
         Backlog

@@ -1,6 +1,7 @@
 import {
   FEATURE_STATUS_CLASSES,
   FEATURE_STATUS_LABELS,
+  FEATURE_STATUS_SOLID_CLASSES,
   PRIORITY_BARS,
   PRIORITY_CLASSES,
   PRIORITY_LABELS,
@@ -32,6 +33,22 @@ export function StatusBadge({ status }: { status: string }) {
       className={cn(
         "inline-flex h-6.5 items-center gap-1.5 rounded-full px-2.5 text-small leading-none whitespace-nowrap",
         FEATURE_STATUS_CLASSES[value],
+      )}
+    >
+      <StatusDot pulse={value === "in_progress"} />
+      {FEATURE_STATUS_LABELS[value]}
+    </span>
+  );
+}
+
+// Statut en bloc de couleur pleine, qui remplit toute sa cellule (vue Liste).
+export function StatusBlock({ status }: { status: string }) {
+  const value = toFeatureStatus(status);
+  return (
+    <span
+      className={cn(
+        "flex h-9 w-full items-center justify-center gap-1.5 rounded-md px-2 text-small whitespace-nowrap shadow-clay-sm",
+        FEATURE_STATUS_SOLID_CLASSES[value],
       )}
     >
       <StatusDot pulse={value === "in_progress"} />

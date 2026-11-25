@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_STATUSES, PRIORITIES } from "@/lib/constants";
@@ -62,8 +61,8 @@ export async function updateFeature(featureId: number, values: FeatureValues): P
   return updateOneFeature(featureId, toFeatureRow(parsed.data));
 }
 
-// Suppression : ses commentaires partent avec elle (ON DELETE CASCADE),
-// puis on retourne au Backlog.
+// Suppression : ses commentaires partent avec elle (ON DELETE CASCADE).
+// Le retour au Backlog est fait par le navigateur, qui affiche aussi une notification.
 export async function deleteFeature(featureId: number): Promise<ActionResult> {
   const supabase = await createClient();
   const result = await supabase.from("features").delete().eq("id", featureId).select("id");
@@ -71,10 +70,9 @@ export async function deleteFeature(featureId: number): Promise<ActionResult> {
     result,
     "Suppression refusée : seuls un admin ou la personne assignée peuvent supprimer cette feature.",
   );
-  if (checked.error) return checked;
-
-  revalidatePath("/", "layout");
-  redirect("/");
+  // Pas de revalidatePath ici : il recalculerait tout de suite la page de la feature
+  // supprimée (page 404). Le navigateur part vers le Backlog, chargé à neuf.
+  return checked;
 }
 
 // Les actions suivantes sont branchées sur un formulaire (FormData) via

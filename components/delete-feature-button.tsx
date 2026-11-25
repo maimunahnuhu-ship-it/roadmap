@@ -3,7 +3,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2Icon } from "lucide-react";
+import { toast } from "sonner";
 import { deleteFeature } from "@/lib/actions/features";
 import {
   Dialog,
@@ -30,13 +32,18 @@ export function DeleteFeatureButton({
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   function handleDelete() {
     startTransition(async () => {
-      // Si tout va bien, l'action redirige vers le Backlog ;
-      // sinon elle renvoie le message de refus.
       const result = await deleteFeature(featureId);
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      // Supprimée : retour au Backlog, avec une notification.
+      toast.success("Feature supprimée");
+      router.push("/");
     });
   }
 

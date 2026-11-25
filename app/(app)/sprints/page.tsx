@@ -39,7 +39,7 @@ export default async function SprintsPage() {
       {!sprints || sprints.length === 0 ? (
         <p className="text-ink-soft">Aucun sprint pour l&apos;instant.</p>
       ) : (
-        <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {sprints.map((sprint) => {
             const total = sprint.features.length;
             const done = sprint.features.filter((feature) => feature.status === "done").length;

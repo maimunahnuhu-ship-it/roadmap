@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSprint, updateSprint } from "@/lib/actions/sprints";
 import { sprintSchema, type SprintValues } from "@/lib/schemas";
@@ -54,6 +55,7 @@ export function SprintFormDialog({ trigger, sprint }: SprintFormDialogProps) {
       return;
     }
     setOpen(false);
+    toast.success(sprint ? "Sprint modifié !" : "Sprint créé !");
   }
 
   return (
