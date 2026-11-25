@@ -60,16 +60,16 @@ Les tests ont été faits avec deux comptes :
 - **Marie Laurent**, `role = 'user'` ;
 - **Sarah Kessler**, `role = 'admin'`.
 
-| # | Scénario | Compte | Résultat attendu | Résultat |
-| --- | --- | --- | --- | --- |
-| 1 | Créer une feature (bouton « Nouvelle feature » ou capture rapide) | Sarah | Les boutons sont visibles et la feature est créée | ✅ Validé |
-| 2 | Chercher les boutons de création | Marie | « Nouvelle feature » et la capture rapide sont absents | ✅ Validé |
-| 3 | Modifier puis supprimer (avec confirmation) une feature assignée à quelqu'un d'autre | Sarah | Modification enregistrée, suppression faite, retour au Backlog | ✅ Validé |
-| 4 | Modifier une feature assignée à Marie (statut, sprint, formulaire Modifier) | Marie | Modifications enregistrées | ✅ Validé |
-| 5 | Ouvrir une feature assignée à quelqu'un d'autre | Marie | Lecture seule : pas de Modifier ni de Supprimer, pas de changements rapides | ✅ Validé |
-| 6 | Kanban : glisser des cartes d'une colonne à l'autre | Marie, puis Sarah | Marie ne déplace que ses cartes, Sarah les déplace toutes | ✅ Validé |
-| 7 | Modifier un commentaire | Marie | « Modifier » n'apparaît que sur ses propres commentaires, et la modification est enregistrée | ✅ Validé |
-| 8 | Page « Mon profil » : changer son prénom et son nom | Marie | Nom mis à jour dans le menu, rôle affiché en texte seul, impossible à modifier | ✅ Validé |
+| # | Scénario | Résultat attendu | Résultat |
+| --- | --- | --- | --- |
+| 1 | Un compte user peut lire les features mais pas en créer | Lecture possible, création refusée | ✅ Validé |
+| 2 | Un compte admin peut créer une feature | Création acceptée | ✅ Validé |
+| 3 | Un user assigné à une feature peut la modifier | Modification acceptée | ✅ Validé |
+| 4 | Modifier une feature assignée à quelqu'un d'autre | Modification refusée | ✅ Validé |
+| 5 | Créer un commentaire puis le modifier | Création et modification acceptées | ✅ Validé |
+| 6 | Modifier le commentaire de quelqu'un d'autre | Modification refusée | ✅ Validé |
+| 7 | Modifier son profil (prénom, nom) | Modification acceptée | ✅ Validé |
+| 8 | Changer son rôle de user à admin | Modification refusée | ✅ Validé |
 
 ## 6. Attaques testées
 
