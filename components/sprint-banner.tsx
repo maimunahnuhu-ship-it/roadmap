@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRightIcon, RocketIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/queries";
+import { isAdmin } from "@/lib/permissions";
 import { formatDay, fullName, sprintName } from "@/lib/format";
 import { SprintStatusBadge } from "@/components/badges";
 import { PersonAvatar } from "@/components/person-avatar";
@@ -20,8 +22,9 @@ export async function SprintBanner() {
     .limit(1)
     .maybeSingle();
 
-  // Pas de sprint actif : on invite à en lancer un.
+  // Pas de sprint actif : on invite à en lancer un (seul un admin peut le faire).
   if (!sprint) {
+    const canLaunch = isAdmin(await getCurrentProfile());
     return (
       <section className="mb-10 flex flex-wrap items-center gap-6 rounded-xl border-2 border-dashed border-border bg-surface/60 p-6">
         <span className="flex size-14 items-center justify-center rounded-full bg-accent-soft text-accent shadow-clay-sm">
@@ -29,14 +32,20 @@ export async function SprintBanner() {
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-title text-h3">Aucun sprint en cours</h2>
-          <p className="text-ink-soft">Choisis quelques features du backlog et lance un sprint pour donner le rythme à l&apos;équipe.</p>
+          <p className="text-ink-soft">
+            {canLaunch
+              ? "Choisis quelques features du backlog et lance un sprint pour donner le rythme à l’équipe."
+              : "Un admin lancera le prochain sprint. En attendant, le backlog t’attend."}
+          </p>
         </div>
-        <Button asChild>
-          <Link href="/sprints">
-            Lancer un sprint
-            <ArrowRightIcon aria-hidden="true" />
-          </Link>
-        </Button>
+        {canLaunch && (
+          <Button asChild>
+            <Link href="/sprints">
+              Lancer un sprint
+              <ArrowRightIcon aria-hidden="true" />
+            </Link>
+          </Button>
+        )}
       </section>
     );
   }

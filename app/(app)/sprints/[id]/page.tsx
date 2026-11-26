@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeftIcon, PencilIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { FEATURE_WITH_RELATIONS, getCurrentProfile } from "@/lib/queries";
-import { canEditFeature } from "@/lib/permissions";
+import { canEditFeature, isAdmin } from "@/lib/permissions";
 import { updateSprintStatus } from "@/lib/actions/sprints";
 import { SPRINT_STATUSES, SPRINT_STATUS_LABELS } from "@/lib/constants";
 import { getKanbanColumns } from "@/lib/views";
@@ -65,29 +65,34 @@ export default async function SprintPage({ params }: PageProps<"/sprints/[id]">)
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* key : recrée le formulaire après un changement, pour afficher le statut enregistré */}
-          <ActionForm key={sprint.status} action={updateSprintStatus.bind(null, sprint.id)}>
-            <AutoSubmitSelect variant="chip" name="status" defaultValue={sprint.status} aria-label="Statut du sprint">
-              {SPRINT_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  Statut : {SPRINT_STATUS_LABELS[status].toLowerCase()}
-                </option>
-              ))}
-            </AutoSubmitSelect>
-          </ActionForm>
-          <SprintFormDialog
-            sprint={{
-              id: sprint.id,
-              name,
-              values: { start_date: sprint.start_date, end_date: sprint.end_date, goal: sprint.goal ?? "" },
-            }}
-            trigger={
-              <Button variant="secondary">
-                <PencilIcon aria-hidden="true" />
-                Modifier
-              </Button>
-            }
-          />
+          {/* Policy « Admins can update sprints » : seul un admin change le statut ou les dates */}
+          {isAdmin(viewer) && (
+            <>
+              {/* key : recrée le formulaire après un changement, pour afficher le statut enregistré */}
+              <ActionForm key={sprint.status} action={updateSprintStatus.bind(null, sprint.id)}>
+                <AutoSubmitSelect variant="chip" name="status" defaultValue={sprint.status} aria-label="Statut du sprint">
+                  {SPRINT_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      Statut : {SPRINT_STATUS_LABELS[status].toLowerCase()}
+                    </option>
+                  ))}
+                </AutoSubmitSelect>
+              </ActionForm>
+              <SprintFormDialog
+                sprint={{
+                  id: sprint.id,
+                  name,
+                  values: { start_date: sprint.start_date, end_date: sprint.end_date, goal: sprint.goal ?? "" },
+                }}
+                trigger={
+                  <Button variant="secondary">
+                    <PencilIcon aria-hidden="true" />
+                    Modifier
+                  </Button>
+                }
+              />
+            </>
+          )}
           {/* On ne propose que les features que la RLS autorise à déplacer */}
           <AddFeaturesDialog
             sprintId={sprint.id}

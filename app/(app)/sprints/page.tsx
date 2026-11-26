@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/queries";
+import { isAdmin } from "@/lib/permissions";
 import { formatDay, sprintName } from "@/lib/format";
 import { ProgressBar, SprintStatusBadge } from "@/components/badges";
 import { SprintFormDialog } from "@/components/sprint-form-dialog";
@@ -14,10 +16,10 @@ export default async function SprintsPage() {
   const supabase = await createClient();
   // features(status) : on charge le statut des features de chaque sprint
   // pour les compter ici (le nombre n'est pas stocké dans la base).
-  const { data: sprints } = await supabase
-    .from("sprints")
-    .select("*, features(status)")
-    .order("start_date", { ascending: true });
+  const [{ data: sprints }, viewer] = await Promise.all([
+    supabase.from("sprints").select("*, features(status)").order("start_date", { ascending: true }),
+    getCurrentProfile(),
+  ]);
 
   return (
     <>
@@ -26,14 +28,17 @@ export default async function SprintsPage() {
           <h1 className="font-title text-h1">Sprints</h1>
           <p className="text-ink-soft">Des périodes de travail d&apos;une à deux semaines.</p>
         </div>
-        <SprintFormDialog
-          trigger={
-            <Button>
-              <PlusIcon aria-hidden="true" />
-              Créer un sprint
-            </Button>
-          }
-        />
+        {/* Policy « Admins can insert sprints » : seul un admin crée un sprint */}
+        {isAdmin(viewer) && (
+          <SprintFormDialog
+            trigger={
+              <Button>
+                <PlusIcon aria-hidden="true" />
+                Créer un sprint
+              </Button>
+            }
+          />
+        )}
       </div>
 
       {!sprints || sprints.length === 0 ? (

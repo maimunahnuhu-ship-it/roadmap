@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, PencilIcon, PlusIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/queries";
+import { isAdmin } from "@/lib/permissions";
 import { ModuleDot } from "@/components/badges";
 import { ModuleFormDialog } from "@/components/module-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -13,7 +15,12 @@ export const metadata: Metadata = { title: "Modules · Roadmap" };
 export default async function ModulesPage() {
   const supabase = await createClient();
   // features(count) : Supabase compte les features de chaque module.
-  const { data: modules } = await supabase.from("modules").select("*, features(count)").order("name");
+  const [{ data: modules }, viewer] = await Promise.all([
+    supabase.from("modules").select("*, features(count)").order("name"),
+    getCurrentProfile(),
+  ]);
+  // Policies « Admins can insert / update modules » : seul un admin crée ou modifie.
+  const canManage = isAdmin(viewer);
 
   return (
     <>
@@ -22,14 +29,16 @@ export default async function ModulesPage() {
           <h1 className="font-title text-h1">Modules</h1>
           <p className="text-ink-soft">Les grandes parties du produit, chacune avec sa couleur.</p>
         </div>
-        <ModuleFormDialog
-          trigger={
-            <Button>
-              <PlusIcon aria-hidden="true" />
-              Nouveau module
-            </Button>
-          }
-        />
+        {canManage && (
+          <ModuleFormDialog
+            trigger={
+              <Button>
+                <PlusIcon aria-hidden="true" />
+                Nouveau module
+              </Button>
+            }
+          />
+        )}
       </div>
 
       <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -55,18 +64,20 @@ export default async function ModulesPage() {
                     <ArrowRightIcon aria-hidden="true" />
                   </Link>
                 </Button>
-                <ModuleFormDialog
-                  module={{
-                    id: module.id,
-                    values: { name: module.name, color: module.color, description: module.description ?? "" },
-                  }}
-                  trigger={
-                    <Button variant="ghost" size="sm">
-                      <PencilIcon aria-hidden="true" />
-                      Modifier
-                    </Button>
-                  }
-                />
+                {canManage && (
+                  <ModuleFormDialog
+                    module={{
+                      id: module.id,
+                      values: { name: module.name, color: module.color, description: module.description ?? "" },
+                    }}
+                    trigger={
+                      <Button variant="ghost" size="sm">
+                        <PencilIcon aria-hidden="true" />
+                        Modifier
+                      </Button>
+                    }
+                  />
+                )}
               </div>
             </li>
           );
