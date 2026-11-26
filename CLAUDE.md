@@ -54,7 +54,7 @@ Supabase
 
 La base Supabase existe déjà : tu la réutilises, tu ne la (re)crées pas.
 Avant d'écrire le moindre code de données, lis le schéma existant (via le MCP Supabase). N'invente jamais de table ni de colonne
-Aucune migration, aucun CREATE TABLE / ALTER TABLE, aucun seed : tu ne modifies pas le schéma
+Tout changement de schéma passe par un nouveau fichier de migration dans supabase/migrations/.
 Reprends exactement les noms de tables et de colonnes existants
 Génère les types TypeScript à partir du schéma réel (generate_typescript_types via le MCP, ou des types strictement alignés sur les colonnes existantes) — pas de types inventés
 Deux clients séparés : createServerClient côté serveur (lit les cookies) et createBrowserClient côté navigateur, rangés dans lib/supabase/
