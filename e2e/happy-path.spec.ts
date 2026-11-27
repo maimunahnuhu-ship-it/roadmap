@@ -12,7 +12,8 @@ test("un membre se connecte et voit les features du Backlog", async ({ page }) =
   await page.getByLabel("Mot de passe").fill(password);
   await page.getByRole("button", { name: "Se connecter" }).click();
 
-  await expect(page).toHaveURL("/");
+  // Au premier lancement, le serveur de dev compile l'accueil : on lui laisse 45 s au lieu de 5.
+  await expect(page).toHaveURL("/", { timeout: 45_000 });
   await expect(page.getByRole("heading", { level: 1, name: "Backlog" })).toBeVisible();
   await expect(page.getByText(/^[1-9]\d* features? trouvées?$/)).toBeVisible();
   await expect(page.getByRole("main").getByRole("listitem").getByRole("link").first()).toBeVisible();

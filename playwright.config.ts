@@ -13,9 +13,9 @@ try {
 export default defineConfig({
   // Les tests sont rangés dans le dossier e2e/.
   testDir: "./e2e",
-  // Un test qui dépasse 60 secondes est considéré comme échoué
+  // Un test qui dépasse 90 secondes est considéré comme échoué
   // (le premier affichage d'une page en dev peut être lent, le temps de compiler).
-  timeout: 60_000,
+  timeout: 90_000,
   // Liste lisible des résultats dans le terminal.
   reporter: "list",
   use: {
